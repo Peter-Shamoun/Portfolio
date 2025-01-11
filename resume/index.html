@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
     <title>Peter Shamoun Resume</title>
 </head>
 <body>
@@ -12,67 +13,92 @@
         <a href="../projects/index.html">My projects!</a>
         <a href="https://github.com/Peter-Shamoun" target="_blank">My GitHub profile!</a>
     </nav>
-    <h1>Peter Shamoun</h1>
-    <p>619-616-3027 | petershamoun80@gmail.com | <a href="https://www.linkedin.com/in/peter-shamoun">www.linkedin.com/in/peter-shamoun</a></p>
+    
+    <section class="header">
+        <h1>Peter Shamoun</h1>
+        <p>619-616-3027 | petershamoun80@gmail.com | <a href="https://www.linkedin.com/in/peter-shamoun">www.linkedin.com/in/peter-shamoun</a></p>
+    </section>
 
-    <h2>Education</h2>
-    <p><strong>University of California, San Diego</strong>, San Diego, CA<br>Bachelor of Science in Data Science<br><em>Expected: June 2026</em></p>
-    <p><strong>Relevant Coursework:</strong><br>Data Structures and Algorithms, Programming and Data Structures, Practice and Application of Data Science, Statistical Modeling, Theoretical Foundations of Data Science</p>
+    <section class="education">
+        <h2>Education</h2>
+        <p><strong>University of California, San Diego</strong>, San Diego, CA<br>Bachelor of Science in Data Science<br><em>Expected: June 2026</em></p>
+        <p><strong>Relevant Coursework:</strong><br>Data Structures and Algorithms, Programming and Data Structures, Practice and Application of Data Science, Statistical Modeling, Theoretical Foundations of Data Science</p>
+    </section>
 
-    <h2>Experience</h2>
-    <h3>Undergraduate Researcher</h3>
-    <p><strong>Data Science Alliance</strong>, San Diego, CA<br><em>Sep. 2024 - Present</em></p>
-    <ul>
-        <li>Leading a project to determine optimal food bank locations throughout San Diego using QGIS, Python, SQL, and a classifier model, providing policymakers with data-driven insights to inform decisions on food bank placement.</li>
-    </ul>
+    <section class="experience">
+        <h2>Experience</h2>
+        
+        <article>
+            <h3>Undergraduate Researcher</h3>
+            <p><strong>Data Science Alliance</strong>, San Diego, CA<br><em>Sep. 2024 - Present</em></p>
+            <ul>
+                <li>Leading a project to determine optimal food bank locations throughout San Diego using QGIS, Python, SQL, and a classifier model, providing policymakers with data-driven insights to inform decisions on food bank placement.</li>
+            </ul>
+        </article>
 
-    <h3>Data Analyst Intern</h3>
-    <p><strong>Nexon America</strong>, Los Angeles, CA<br><em>June 2024 - Sep. 2024</em></p>
-    <ul>
-        <li>Developed complex SQL queries across 10+ tables to extract key metrics on payments, interactions, and login behaviors.</li>
-        <li>Delivered multiple Tableau dashboards to the marketing team to serve as an internal tool enabling data-driven decisions on marketing spend based on user value.</li>
-        <li>Presented the tool to both technical and non-technical teams, with the work being featured in a company-wide newsletter.</li>
-    </ul>
+        <article>
+            <h3>Data Analyst Intern</h3>
+            <p><strong>Nexon America</strong>, Los Angeles, CA<br><em>June 2024 - Sep. 2024</em></p>
+            <ul>
+                <li>Developed complex SQL queries across 10+ tables to extract key metrics on payments, interactions, and login behaviors.</li>
+                <li>Delivered multiple Tableau dashboards to the marketing team to serve as an internal tool enabling data-driven decisions on marketing spend based on user value.</li>
+                <li>Presented the tool to both technical and non-technical teams, with the work being featured in a company-wide newsletter.</li>
+            </ul>
+        </article>
 
-    <h3>Research Assistant</h3>
-    <p><strong>San Diego SuperComputer Center</strong>, San Diego, CA<br><em>Jan. 2024 - June 2024</em></p>
-    <ul>
-        <li>Created a comprehensive database with SQLite, housing 150,000 matrices for extensive research.</li>
-        <li>Designed and implemented a high-accuracy neural network with Keras TensorFlow to predict the error caused by matrix compression with up to 95% accuracy.</li>
-        <li>Visualized findings using Matplotlib to show the model's ability to predict truncation errors within matrices.</li>
-    </ul>
+        <article>
+            <h3>Research Assistant</h3>
+            <p><strong>San Diego SuperComputer Center</strong>, San Diego, CA<br><em>Jan. 2024 - June 2024</em></p>
+            <ul>
+                <li>Created a comprehensive database with SQLite, housing 150,000 matrices for extensive research.</li>
+                <li>Designed and implemented a high-accuracy neural network with Keras TensorFlow to predict the error caused by matrix compression with up to 95% accuracy.</li>
+                <li>Visualized findings using Matplotlib to show the model's ability to predict truncation errors within matrices.</li>
+            </ul>
+        </article>
 
-    <h3>Software Engineering Intern</h3>
-    <p><strong>STEMz Learning</strong>, San Diego, CA<br><em>Feb. 2024 - Apr. 2024</em></p>
-    <ul>
-        <li>Refactored a recommendation system, providing users with curated suggestions based on their browsing history, increasing accuracy by 60%.</li>
-        <li>Implemented a back-end framework that reduced website response time by 30%, handling over 1,000 HTTP requests per day.</li>
-        <li>Enhanced user authentication speed by 25% and integrated MFA in React using Firebase authentication.</li>
-    </ul>
+        <article>
+            <h3>Software Engineering Intern</h3>
+            <p><strong>STEMz Learning</strong>, San Diego, CA<br><em>Feb. 2024 - Apr. 2024</em></p>
+            <ul>
+                <li>Refactored a recommendation system, providing users with curated suggestions based on their browsing history, increasing accuracy by 60%.</li>
+                <li>Implemented a back-end framework that reduced website response time by 30%, handling over 1,000 HTTP requests per day.</li>
+                <li>Enhanced user authentication speed by 25% and integrated MFA in React using Firebase authentication.</li>
+            </ul>
+        </article>
+    </section>
 
-    <h2>Projects</h2>
-    <h3>AI-Powered Supermarket Deal Finder</h3>
-    <p><strong>Python, ChatGPT API, Selenium, Streamlit</strong><br><em>Aug. 2024 = Present</em></p>
-    <ul>
-        <li>Developed an automated web scraper using Selenium, BeautifulSoup, and bash scripting to capture supermarket ad images and extract item prices and names using Meta’s Segment Anything model and ChatGPT API.</li>
-        <li>Created a pandas-based data pipeline to store and organize item names, prices, and store information, enabling efficient analysis and comparison of supermarket deals.</li>
-        <li>Designed a user-friendly Streamlit frontend where users can search for products and view the best supermarket deals, resulting in 100+ active users and 500+ requests per day.</li>
-    </ul>
+    <section class="projects">
+        <h2>Projects</h2>
+        
+        <article>
+            <h3>AI-Powered Supermarket Deal Finder</h3>
+            <p><strong>Python, ChatGPT API, Selenium, Streamlit</strong><br><em>Aug. 2024 - Present</em></p>
+            <ul>
+                <li>Developed an automated web scraper using Selenium, BeautifulSoup, and bash scripting to capture supermarket ad images and extract item prices and names using Meta's Segment Anything model and ChatGPT API.</li>
+                <li>Created a pandas-based data pipeline to store and organize item names, prices, and store information, enabling efficient analysis and comparison of supermarket deals.</li>
+                <li>Designed a user-friendly Streamlit frontend where users can search for products and view the best supermarket deals, resulting in 100+ active users and 500+ requests per day.</li>
+            </ul>
+        </article>
 
-    <h3>Ensemble CNN Image Classifier</h3>
-    <p><strong>Python, TensorFlow, PIL, React</strong><br><em>Apr. 2024</em></p>
-    <ul>
-        <li>Developed and trained an ensemble of Convolutional Neural Networks to achieve 85% accuracy in image classification tasks.</li>
-        <li>Implemented image preprocessing pipelines in PIL, including resizing, normalization, and augmentation techniques.</li>
-        <li>Hosted the model on a React.js frontend, enabling users to upload images and view classification results in real-time.</li>
-    </ul>
+        <article>
+            <h3>Ensemble CNN Image Classifier</h3>
+            <p><strong>Python, TensorFlow, PIL, React</strong><br><em>Apr. 2024</em></p>
+            <ul>
+                <li>Developed and trained an ensemble of Convolutional Neural Networks to achieve 85% accuracy in image classification tasks.</li>
+                <li>Implemented image preprocessing pipelines in PIL, including resizing, normalization, and augmentation techniques.</li>
+                <li>Hosted the model on a React.js frontend, enabling users to upload images and view classification results in real-time.</li>
+            </ul>
+        </article>
+    </section>
 
-    <h2>Technical Skills</h2>
-    <ul>
-        <li><strong>Languages:</strong> Python, SQL, Java, R, MATLAB, JavaScript</li>
-        <li><strong>Certifications:</strong> Machine Learning Specialization by DeepLearning.AI and Stanford University</li>
-        <li><strong>Tools:</strong> Snowflake, Amazon AWS, Microsoft Office, Tableau, Github</li>
-        <li><strong>Libraries:</strong> Pandas, BeautifulSoup, TensorFlow, Plotly, scikit-learn, PIL, Streamlit, Selenium</li>
-    </ul>
+    <section class="skills">
+        <h2>Technical Skills</h2>
+        <ul>
+            <li><strong>Languages:</strong> Python, SQL, Java, R, MATLAB, JavaScript</li>
+            <li><strong>Certifications:</strong> Machine Learning Specialization by DeepLearning.AI and Stanford University</li>
+            <li><strong>Tools:</strong> Snowflake, Amazon AWS, Microsoft Office, Tableau, Github</li>
+            <li><strong>Libraries:</strong> Pandas, BeautifulSoup, TensorFlow, Plotly, scikit-learn, PIL, Streamlit, Selenium</li>
+        </ul>
+    </section>
 </body>
 </html>

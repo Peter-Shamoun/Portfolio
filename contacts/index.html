@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
     <title>Contact</title>
 </head>
 <body>
@@ -14,15 +15,19 @@
         <a href="https://github.com/Peter-Shamoun" target="_blank">My GitHub profile!</a>
     </nav>
     <form action="mailto:pshamoun@ucsd.edu" method="POST" enctype="text/plain">
-        <label>Email</label>
-        <input name="email" type="email">
-        <label>Subject</label>
-        <input name="subject">
-        <label>Body</label>
-        <textarea name=""body> </textarea>
-        <button>Submit</button>
-      </form>
-      
-
+        <label>
+            Email:
+            <input name="email" type="email" value="example@email.com">
+        </label>
+        <label>
+            Subject:
+            <input name="subject" value="Hello!">
+        </label>
+        <label>
+            Message:
+            <textarea name="body" rows="5">Your message here...</textarea>
+        </label>
+        <button>Send Message</button>
+    </form>
 </body>
 </html>
