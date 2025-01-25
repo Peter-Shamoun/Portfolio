@@ -4,6 +4,22 @@ function $$(selector, context = document) {
   return Array.from(context.querySelectorAll(selector));
 }
 
+// Handle contact form submission
+const form = document.querySelector('#contactForm');
+form?.addEventListener('submit', function(event) {
+  event.preventDefault();
+  
+  const data = new FormData(event.target);
+  let params = [];
+  
+  for (let [name, value] of data) {
+    params.push(`${name}=${encodeURIComponent(value)}`);
+  }
+  
+  const url = `mailto:pshamoun@ucsd.edu?${params.join('&')}`;
+  location.href = url;
+});
+
 // Add theme selector
 const isDarkMode = matchMedia("(prefers-color-scheme: dark)").matches;
 const autoText = `Automatic (${isDarkMode ? "Dark" : "Light"})`;
