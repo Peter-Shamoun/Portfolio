@@ -10,7 +10,7 @@ const pages = [
   { url: 'projects/', title: 'Projects' },
   { url: 'contacts/', title: 'Contact' },
   { url: 'resume/', title: 'Resume' },
-  { url: 'https://github.com/Peter-Shamoun', title: 'GitHub Profile', target: '_blank' }
+  { url: 'https://github.com/Peter-Shamoun', title: 'GitHub Profile' }
 ];
 
 // Check if we're on the home page
@@ -27,16 +27,25 @@ for (let p of pages) {
   // Add ../ prefix if we're not on home page and URL is not absolute
   url = !ARE_WE_HOME && !url.startsWith('http') ? '../' + url : url;
   
-  // Create the link with optional target attribute
-  const targetAttr = p.target ? ` target="${p.target}"` : '';
-  nav.insertAdjacentHTML('beforeend', `<a href="${url}"${targetAttr}>${p.title}</a>`);
+  // Create link element
+  let a = document.createElement('a');
+  a.href = url;
+  a.textContent = p.title;
+  
+  // Add current class if this is the current page
+  a.classList.toggle(
+    'current',
+    a.host === location.host && a.pathname === location.pathname
+  );
+  
+  // Add target="_blank" for external links
+  if (a.host !== location.host) {
+    a.target = '_blank';
+  }
+  
+  nav.append(a);
 }
 
-// Add current class to the active link
-const navLinks = $$("nav a");
-let currentLink = navLinks.find(
+console.log('Current link:', $$("nav a").find(
   (a) => a.host === location.host && a.pathname === location.pathname
-);
-currentLink?.classList.add('current');
-
-console.log('Current link:', currentLink); // For debuggings
+)); // For debuggings
