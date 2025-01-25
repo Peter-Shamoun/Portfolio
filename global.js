@@ -1,3 +1,12 @@
+// Move this code to the very top of global.js, before any other code
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const savedScheme = localStorage.getItem('colorScheme');
+
+// Apply theme immediately
+if (savedScheme === 'dark' || (savedScheme !== 'light' && prefersDark)) {
+  document.documentElement.classList.add('dark-mode');
+}
+
 console.log('IT\'S ALIVE!');
 
 function $$(selector, context = document) {
