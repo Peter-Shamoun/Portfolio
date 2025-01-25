@@ -18,6 +18,23 @@ body {
   background: var(--color-background);
 }
 
+.color-scheme {
+  display: block;
+  text-align: right;
+  margin-bottom: 1em;
+}
+
+.color-scheme select {
+  margin-left: 0.5em;
+  font: inherit;
+  font-size: 0.9em;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: canvas;
+  color: canvastext;
+}
+
 nav {
   --border-color: oklch(50% 10% 200 / 40%);
   display: flex;

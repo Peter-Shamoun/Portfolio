@@ -4,6 +4,23 @@ function $$(selector, context = document) {
   return Array.from(context.querySelectorAll(selector));
 }
 
+// Add theme selector
+const isDarkMode = matchMedia("(prefers-color-scheme: dark)").matches;
+const autoText = `Automatic (${isDarkMode ? "Dark" : "Light"})`;
+
+document.body.insertAdjacentHTML(
+  'afterbegin',
+  `
+  <label class="color-scheme">
+    Theme:
+    <select>
+      <option value="light dark">${autoText}</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </label>`
+);
+
 // Configuration for our site's pages
 const pages = [
   { url: '', title: 'Home' },
