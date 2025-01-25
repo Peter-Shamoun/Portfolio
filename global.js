@@ -5,3 +5,8 @@ function $$(selector, context = document) {
 }
 
 const navLinks = $$("nav a");
+let currentLink = navLinks.find(
+  (a) => a.host === location.host && a.pathname === location.pathname
+);
+
+console.log('Current link:', currentLink); // For debugging
