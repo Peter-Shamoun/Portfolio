@@ -19,15 +19,15 @@ body {
 }
 
 .color-scheme {
-  display: block;
-  text-align: right;
-  margin-bottom: 1em;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 80%;
 }
 
 .color-scheme select {
   margin-left: 0.5em;
   font: inherit;
-  font-size: 0.9em;
   padding: 0.2em 0.5em;
   border-radius: 4px;
   border: 1px solid var(--border-color);
@@ -119,11 +119,14 @@ form button:hover {
   background: oklch(from var(--color-accent) l c 0);
 }
 
+form input, form textarea, select {
+  font: inherit;
+}
+
 form input, form textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font: inherit;
   width: 100%;
   box-sizing: border-box;
 }
