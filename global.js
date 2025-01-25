@@ -46,9 +46,6 @@ form?.addEventListener('submit', function(event) {
 });
 
 // Add theme selector
-const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-const autoText = `System (${isDarkMode ? "Dark" : "Light"})`;
-
 document.body.insertAdjacentHTML(
   'afterbegin',
   `
