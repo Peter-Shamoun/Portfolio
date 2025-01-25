@@ -23,9 +23,19 @@ document.body.insertAdjacentHTML(
 
 // Add theme switching functionality
 const select = document.querySelector('.color-scheme select');
+
+// Restore saved preference if it exists
+if ("colorScheme" in localStorage) {
+  const savedScheme = localStorage.colorScheme;
+  document.documentElement.style.setProperty('color-scheme', savedScheme);
+  select.value = savedScheme;
+}
+
 select.addEventListener('input', function (event) {
-  console.log('color scheme changed to', event.target.value);
-  document.documentElement.style.setProperty('color-scheme', event.target.value);
+  const newScheme = event.target.value;
+  console.log('color scheme changed to', newScheme);
+  document.documentElement.style.setProperty('color-scheme', newScheme);
+  localStorage.colorScheme = newScheme;
 });
 
 // Configuration for our site's pages
