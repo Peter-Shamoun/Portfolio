@@ -10,15 +10,13 @@
   color-scheme: light dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-accent: oklch(65% 0.2 240);
-    --color-text: oklch(98% 0.02 240);
-    --color-background: oklch(25% 0.01 240);
-    --color-muted: oklch(40% 0.02 240);
-    --form-background: oklch(30% 0.01 240);
-    --border-color: oklch(40% 0.02 240);
-  }
+:root.dark-mode {
+  --color-accent: oklch(65% 0.2 240);
+  --color-text: oklch(98% 0.02 240);
+  --color-background: oklch(25% 0.01 240);
+  --color-muted: oklch(40% 0.02 240);
+  --form-background: oklch(30% 0.01 240);
+  --border-color: oklch(40% 0.02 240);
 }
 
 body {

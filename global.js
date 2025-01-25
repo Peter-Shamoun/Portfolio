@@ -45,11 +45,22 @@ if ("colorScheme" in localStorage) {
   const savedScheme = localStorage.colorScheme;
   document.documentElement.style.setProperty('color-scheme', savedScheme);
   select.value = savedScheme;
+  
+  if (localStorage.colorScheme === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+  }
 }
 
 select.addEventListener('input', function (event) {
   const newScheme = event.target.value;
   console.log('color scheme changed to', newScheme);
+  
+  if (newScheme === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+  } else {
+    document.documentElement.classList.remove('dark-mode');
+  }
+  
   document.documentElement.style.setProperty('color-scheme', newScheme);
   localStorage.colorScheme = newScheme;
 });
