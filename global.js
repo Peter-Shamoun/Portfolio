@@ -1,11 +1,27 @@
-// Move this code to the very top of global.js, before any other code
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-const savedScheme = localStorage.getItem('colorScheme');
-
-// Apply theme immediately
-if (savedScheme === 'dark' || (savedScheme !== 'light' && prefersDark)) {
-  document.documentElement.classList.add('dark-mode');
+// Theme handling code - consolidated at the top
+function initializeTheme() {
+  try {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedScheme = localStorage.getItem('colorScheme');
+    const isDark = savedScheme === 'dark' || (savedScheme !== 'light' && prefersDark);
+    
+    if (isDark) {
+      document.documentElement.classList.add('dark-mode');
+      document.documentElement.style.setProperty('color-scheme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      document.documentElement.style.setProperty('color-scheme', 'light');
+    }
+    
+    return isDark ? 'dark' : 'light';
+  } catch (error) {
+    console.error('Error initializing theme:', error);
+    return 'light'; // Fallback to light theme
+  }
 }
+
+// Initialize theme immediately
+const initialTheme = initializeTheme();
 
 console.log('IT\'S ALIVE!');
 
@@ -30,8 +46,8 @@ form?.addEventListener('submit', function(event) {
 });
 
 // Add theme selector
-const isDarkMode = matchMedia("(prefers-color-scheme: dark)").matches;
-const autoText = `Automatic (${isDarkMode ? "Dark" : "Light"})`;
+const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const autoText = `System (${isDarkMode ? "Dark" : "Light"})`;
 
 document.body.insertAdjacentHTML(
   'afterbegin',
@@ -39,7 +55,7 @@ document.body.insertAdjacentHTML(
   <label class="color-scheme">
     Theme:
     <select>
-      <option value="light dark">${autoText}</option>
+      <option value="system">${autoText}</option>
       <option value="light">Light</option>
       <option value="dark">Dark</option>
     </select>
@@ -49,29 +65,36 @@ document.body.insertAdjacentHTML(
 // Add theme switching functionality
 const select = document.querySelector('.color-scheme select');
 
-// Restore saved preference if it exists
-if ("colorScheme" in localStorage) {
-  const savedScheme = localStorage.colorScheme;
-  document.documentElement.style.setProperty('color-scheme', savedScheme);
+// Set initial select value
+try {
+  const savedScheme = localStorage.getItem('colorScheme') || 'system';
   select.value = savedScheme;
-  
-  if (localStorage.colorScheme === 'dark') {
-    document.documentElement.classList.add('dark-mode');
-  }
+} catch (error) {
+  console.error('Error restoring theme preference:', error);
+  select.value = 'system';
 }
 
+// Theme change handler
 select.addEventListener('input', function (event) {
-  const newScheme = event.target.value;
-  console.log('color scheme changed to', newScheme);
-  
-  if (newScheme === 'dark') {
-    document.documentElement.classList.add('dark-mode');
-  } else {
-    document.documentElement.classList.remove('dark-mode');
+  try {
+    const newScheme = event.target.value;
+    console.log('color scheme changed to', newScheme);
+    
+    if (newScheme === 'system') {
+      localStorage.removeItem('colorScheme');
+      initializeTheme(); // This will apply system preference
+    } else {
+      if (newScheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      } else {
+        document.documentElement.classList.remove('dark-mode');
+      }
+      document.documentElement.style.setProperty('color-scheme', newScheme);
+      localStorage.setItem('colorScheme', newScheme);
+    }
+  } catch (error) {
+    console.error('Error changing theme:', error);
   }
-  
-  document.documentElement.style.setProperty('color-scheme', newScheme);
-  localStorage.colorScheme = newScheme;
 });
 
 // Configuration for our site's pages
