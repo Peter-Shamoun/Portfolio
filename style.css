@@ -280,3 +280,93 @@ article h3 {
     transform: translateY(0);
   }
 }
+
+/* Latest Projects Section */
+.latest-projects {
+    margin: 3rem 0;
+}
+
+.latest-projects .projects {
+    margin-bottom: 1.5rem;
+}
+
+.view-all {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.view-all a {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.view-all a:hover {
+    background: oklch(from var(--color-accent) l c 0);
+    transform: translateY(-2px);
+}
+
+/* GitHub Stats Section */
+.github-stats {
+    margin: 3rem 0;
+}
+
+.stats-container {
+    background: var(--form-background);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.stats-container dl {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin: 0;
+    text-align: center;
+}
+
+.stats-container dt {
+    grid-row: 1;
+    font-weight: bold;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.stats-container dd {
+    grid-row: 2;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .stats-container dl {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .stats-container dt:nth-child(1),
+    .stats-container dt:nth-child(2) {
+        grid-row: 1;
+    }
+
+    .stats-container dt:nth-child(3),
+    .stats-container dt:nth-child(4) {
+        grid-row: 3;
+    }
+
+    .stats-container dd:nth-child(5),
+    .stats-container dd:nth-child(6) {
+        grid-row: 2;
+    }
+
+    .stats-container dd:nth-child(7),
+    .stats-container dd:nth-child(8) {
+        grid-row: 4;
+    }
+}

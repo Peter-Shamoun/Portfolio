@@ -1,0 +1,88 @@
+[
+    {
+        "title": "Cheat Sheet AI",
+        "featured": true,
+        "year": 2025,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "An AI-powered cheat sheet generator that builds cheat sheets based on a students course material.",
+        "technologies": ["React JS", "Python", "Flask", "OpenAI"]
+    },
+    {
+        "title": "Graph Theory",
+        "featured": true,
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "An interactive web application that visualizes graph theory algorithms. Built to make learning graph theory more intuitive by letting you watch algorithms like BFS, DFS, Dijkstra's and more run in real-time on your custom graphs.",
+        "technologies": ["React JS", "D3.js", "CSS/HTML"]
+    },
+    {
+        "title": "Firebase Authentication System",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Developed a comprehensive authentication system with email verification, Google sign-in, and protected routes using Firebase and React. Features include email/password registration, Google OAuth integration, email verification flow, and secure route protection with React Router.",
+        "technologies": ["React", "Firebase Auth", "React Router", "CSS"]
+    },
+    {
+        "title": "Nexon America Data Analytics",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Led development of a Lifetime Value analysis system for MapleStory players using Snowflake SQL and Tableau. Created cohort analysis systems and collaborated with Data Science team on player classification models. Built comprehensive dashboards to visualize player behavior and campaign performance metrics.",
+        "technologies": ["Snowflake SQL", "Tableau", "Data Analysis", "Business Intelligence"]
+    },
+    {
+        "title": "Data Science Alliance Research",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Collaborated with the Data Science Alliance to optimize food bank placements in San Diego County by developing a model incorporating demographics, income, and location data, and creating an interactive dashboard for stakeholders.",
+        "technologies": ["Machine Learning", "Spatial Analysis", "Modeling", "Python"]
+    },
+    {
+        "title": "San Diego Supercomputer Center Research",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Developed a machine learning model to predict and compress matrix values derived from plasma physics simulations, achieving approximately 85% accuracy on unseen data and contributing to optimized data management for large-scale computational simulations.",
+        "technologies": ["High Performance Computing", "Data Analysis", "Machine Learning"]
+    },
+    {
+        "title": "Deal Finder",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A webscraper that uses the Segment Anything Model to extract prices from grocery store advertisements, helping users find the best deals at local supermarkets.",
+        "technologies": ["Python", "Segment Anything Model", "Web Scraping"]
+    },
+    {
+        "title": "League of Legends Predictive Analysis",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A data science project analyzing over 10,000 professional League of Legends matches to predict game outcomes based on early-game performance metrics.",
+        "technologies": ["Python", "Pandas", "Plotly", "Scikit-learn"]
+    },
+    {
+        "title": "Email Summarizer",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A web application that uses AI to provide concise summaries of your Gmail inbox from the last 24 hours, built with React, Flask, and OpenAI's API.",
+        "technologies": ["React", "Flask", "Gmail API", "OpenAI API"]
+    },
+    {
+        "title": "Sharp Healthcare AI Voice Assistant",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A voice assistant that enables natural conversations with an AI using built for integration with the Sharp Healthcare app.",
+        "technologies": ["Node.js", "OpenAI API", "Twilio Voice API"]
+    },
+    {
+        "title": "Jurassic Classifier",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A deep learning web application that identifies 15 different dinosaur species from uploaded images using an ensemble of convolutional neural networks.",
+        "technologies": ["TensorFlow", "Keras", "Flask", "HTML/CSS/React"]
+    },
+    {
+        "title": "Hotel Review Sentiment Analysis",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "A deep learning web application trained on 20,000+ hotel reviews that predicts hotel review ratings (1-5 stars) based on user input text.",
+        "technologies": ["TensorFlow", "Keras", "Flask"]
+    }
+]

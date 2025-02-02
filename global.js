@@ -139,3 +139,60 @@ for (let p of pages) {
 console.log('Current link:', $$("nav a").find(
   (a) => a.host === location.host && a.pathname === location.pathname
 )); // For debuggings
+
+// Function to fetch JSON data
+export async function fetchJSON(url) {
+    try {
+        // Fetch the JSON file from the given URL
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch projects: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching or parsing JSON data:', error);
+        return [];
+    }
+}
+
+// Function to render projects
+export function renderProjects(projects, containerElement, headingLevel = 'h2') {
+    if (!containerElement || !Array.isArray(projects)) {
+        console.error('Invalid parameters provided to renderProjects');
+        return;
+    }
+
+    // Clear existing content
+    containerElement.innerHTML = '';
+
+    // If no projects, show a message
+    if (projects.length === 0) {
+        containerElement.innerHTML = '<p>No projects available.</p>';
+        return;
+    }
+
+    // Update the projects count in the title if it exists
+    const titleElement = document.querySelector('.projects-title');
+    if (titleElement) {
+        titleElement.textContent = `Projects (${projects.length})`;
+    }
+
+    // Create and append project articles
+    projects.forEach(project => {
+        const article = document.createElement('article');
+        article.innerHTML = `
+            <${headingLevel}>${project.title}</${headingLevel}>
+            <img src="${project.image || 'https://vis-society.github.io/labs/2/images/empty.svg'}" alt="${project.title}">
+            <p>${project.description}</p>
+        `;
+        containerElement.appendChild(article);
+    });
+}
+
+// Function to fetch GitHub data
+export async function fetchGitHubData(username) {
+    return fetchJSON(`https://api.github.com/users/${username}`);
+}
