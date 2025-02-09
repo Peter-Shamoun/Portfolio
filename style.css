@@ -465,11 +465,11 @@ article h3 {
 
 /* Pie chart hover effects */
 #projects-pie-plot path {
-    transition: opacity 300ms;
+    transition: opacity 300ms, fill 300ms;
     cursor: pointer;
 }
 
-#projects-pie-plot:has(path:hover) path:not(:hover) {
+#projects-pie-plot:has(path:hover) path:not(:hover):not(.selected) {
     opacity: 0.5;
 }
 
@@ -478,6 +478,15 @@ article h3 {
     transition: opacity 300ms;
 }
 
-.legend:has(.legend-item:hover) .legend-item:not(:hover) {
+.legend:has(.legend-item:hover) .legend-item:not(:hover):not(.selected) {
     opacity: 0.5;
+}
+
+/* Selection styles */
+.selected {
+    --color: oklch(60% 45% 0) !important;
+}
+
+.selected:is(path) {
+    fill: var(--color);
 }
