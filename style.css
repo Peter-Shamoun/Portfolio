@@ -462,3 +462,22 @@ article h3 {
     border-color: var(--color-accent);
     box-shadow: 0 0 0 2px oklch(from var(--color-accent) 90% 10% h);
 }
+
+/* Pie chart hover effects */
+#projects-pie-plot path {
+    transition: opacity 300ms;
+    cursor: pointer;
+}
+
+#projects-pie-plot:has(path:hover) path:not(:hover) {
+    opacity: 0.5;
+}
+
+.legend-item {
+    cursor: pointer;
+    transition: opacity 300ms;
+}
+
+.legend:has(.legend-item:hover) .legend-item:not(:hover) {
+    opacity: 0.5;
+}
