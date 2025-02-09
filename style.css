@@ -443,3 +443,22 @@ article h3 {
         height: auto;
     }
 }
+
+/* Search bar styles */
+.searchBar {
+    display: block;
+    width: 100%;
+    padding: 0.8em 1.2em;
+    margin-bottom: 2em;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font: inherit;
+    color: var(--color-text);
+    background: var(--form-background);
+}
+
+.searchBar:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px oklch(from var(--color-accent) 90% 10% h);
+}
