@@ -72,13 +72,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const searchInput = document.querySelector('.searchBar');
         searchInput.addEventListener('input', (event) => {
             query = event.target.value.toLowerCase();
-            filteredProjects = projects.filter(project => 
-                project.title.toLowerCase().includes(query) ||
-                project.description.toLowerCase().includes(query) ||
-                (project.technologies && project.technologies.some(tech => 
-                    tech.toLowerCase().includes(query)
-                ))
-            );
+            filteredProjects = projects.filter(project => {
+                // Convert all project values to a searchable string
+                const projectValues = Object.values(project)
+                    .map(value => {
+                        if (Array.isArray(value)) {
+                            return value.join(' ');
+                        }
+                        return String(value);
+                    })
+                    .join('\n')
+                    .toLowerCase();
+                
+                return projectValues.includes(query);
+            });
             updateVisualizations(filteredProjects);
         });
 
