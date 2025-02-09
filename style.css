@@ -370,3 +370,10 @@ article h3 {
         grid-row: 4;
     }
 }
+
+/* Projects pie plot */
+#projects-pie-plot {
+  max-width: 20em;
+  margin-block: 2em;
+  overflow: visible;
+}
