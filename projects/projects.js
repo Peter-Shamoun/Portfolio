@@ -11,14 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         let query = '';
         let filteredProjects = projects;
 
-        // Function to update visualizations
-        function updateVisualizations(projectsToShow) {
-            // Update projects list
-            const projectsContainer = document.querySelector('.projects');
-            if (projectsContainer) {
-                renderProjects(projectsToShow, projectsContainer, 'h2');
-            }
+        // Create arc generator
+        const arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
+        // Function to render pie chart and legend
+        function renderPieChart(projectsToShow) {
             // Process project data to get counts by year
             let rolledData = d3.rollups(
                 projectsToShow,
@@ -42,21 +39,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             let arcData = sliceGenerator(data);
             let arcs = arcData.map(d => arcGenerator(d));
 
-            // Remove any existing paths
-            d3.select('#projects-pie-plot').selectAll('path').remove();
+            // Clear existing paths and legend
+            let svg = d3.select('#projects-pie-plot');
+            svg.selectAll('path').remove();
+
+            let legend = d3.select('.legend');
+            legend.selectAll('li').remove();
 
             // Add new paths for each slice
             arcs.forEach((arc, idx) => {
-                d3.select('#projects-pie-plot')
-                    .append('path')
+                svg.append('path')
                     .attr('d', arc)
                     .attr('fill', colors(idx));
             });
 
             // Update legend
-            let legend = d3.select('.legend');
-            legend.selectAll('li').remove();
-            
             data.forEach((d, idx) => {
                 legend.append('li')
                     .attr('class', 'legend-item')
@@ -65,8 +62,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Create arc generator
-        let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
+        // Function to update all visualizations
+        function updateVisualizations(projectsToShow) {
+            // Update projects list
+            const projectsContainer = document.querySelector('.projects');
+            if (projectsContainer) {
+                renderProjects(projectsToShow, projectsContainer, 'h2');
+            }
+            // Update pie chart and legend
+            renderPieChart(projectsToShow);
+        }
 
         // Set up search functionality
         const searchInput = document.querySelector('.searchBar');
