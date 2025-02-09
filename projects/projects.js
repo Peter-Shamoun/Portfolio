@@ -21,14 +21,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Create arc generator
         let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
         
-        // Sample data with more values
-        let data = [1, 2, 3, 4, 5, 5];
+        // Sample data with labels
+        let data = [
+            { value: 1, label: 'apples' },
+            { value: 2, label: 'oranges' },
+            { value: 3, label: 'mangos' },
+            { value: 4, label: 'pears' },
+            { value: 5, label: 'limes' },
+            { value: 5, label: 'cherries' }
+        ];
 
         // Create color scale using D3's Tableau 10 color scheme
         let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-        // Create pie generator
-        let sliceGenerator = d3.pie();
+        // Create pie generator with value accessor
+        let sliceGenerator = d3.pie().value(d => d.value);
         let arcData = sliceGenerator(data);
         let arcs = arcData.map(d => arcGenerator(d));
 
