@@ -21,15 +21,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Create arc generator
         let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
         
-        // Sample data with labels
-        let data = [
-            { value: 1, label: 'apples' },
-            { value: 2, label: 'oranges' },
-            { value: 3, label: 'mangos' },
-            { value: 4, label: 'pears' },
-            { value: 5, label: 'limes' },
-            { value: 5, label: 'cherries' }
-        ];
+        // Process project data to get counts by year
+        let rolledData = d3.rollups(
+            projects,
+            v => v.length,
+            d => d.year
+        );
+
+        // Convert rolled data to the format we need
+        let data = rolledData.map(([year, count]) => {
+            return { value: count, label: year.toString() };
+        });
+
+        // Sort data by year
+        data.sort((a, b) => b.label - a.label);
 
         // Create color scale using D3's Tableau 10 color scheme
         let colors = d3.scaleOrdinal(d3.schemeTableau10);
