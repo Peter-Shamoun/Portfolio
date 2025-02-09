@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let query = '';
         let filteredProjects = projects;
         let selectedIndex = -1;
+        let yearData = []; // Store year data for filtering
 
         // Create arc generator
         const arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
@@ -28,15 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .attr('class', (_, idx) => idx === selectedIndex ? 'legend-item selected' : 'legend-item');
         }
 
-        // Function to handle selection
-        function handleSelection(index) {
-            selectedIndex = selectedIndex === index ? -1 : index;
-            updateSelection();
-
-            // Filter projects by selected year if any
+        // Function to filter projects based on search and selection
+        function filterProjects() {
             if (selectedIndex === -1) {
                 // No selection, show all projects that match the search
-                filteredProjects = projects.filter(project => {
+                return projects.filter(project => {
                     const projectValues = Object.values(project)
                         .map(value => {
                             if (Array.isArray(value)) return value.join(' ');
@@ -48,8 +45,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             } else {
                 // Show only projects from the selected year
-                const selectedYear = data[selectedIndex].label;
-                filteredProjects = projects.filter(project => {
+                const selectedYear = yearData[selectedIndex].label;
+                return projects.filter(project => {
                     const matchesSearch = Object.values(project)
                         .map(value => {
                             if (Array.isArray(value)) return value.join(' ');
@@ -61,6 +58,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return project.year.toString() === selectedYear && matchesSearch;
                 });
             }
+        }
+
+        // Function to handle selection
+        function handleSelection(index) {
+            selectedIndex = selectedIndex === index ? -1 : index;
+            updateSelection();
+
+            // Update filtered projects
+            filteredProjects = filterProjects();
 
             // Update project list
             const projectsContainer = document.querySelector('.projects');
@@ -79,19 +85,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
 
             // Convert rolled data to the format we need
-            let data = rolledData.map(([year, count]) => {
+            yearData = rolledData.map(([year, count]) => {
                 return { value: count, label: year.toString() };
             });
 
             // Sort data by year
-            data.sort((a, b) => b.label - a.label);
+            yearData.sort((a, b) => b.label - a.label);
 
             // Create color scale using D3's Tableau 10 color scheme
             let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
             // Create pie generator with value accessor
             let sliceGenerator = d3.pie().value(d => d.value);
-            let arcData = sliceGenerator(data);
+            let arcData = sliceGenerator(yearData);
             let arcs = arcData.map(d => arcGenerator(d));
 
             // Clear existing paths and legend
@@ -110,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             // Update legend
-            data.forEach((d, idx) => {
+            yearData.forEach((d, idx) => {
                 legend.append('li')
                     .attr('class', 'legend-item')
                     .attr('style', `--color: ${colors(idx)}`)
@@ -138,20 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         searchInput.addEventListener('input', (event) => {
             query = event.target.value.toLowerCase();
             selectedIndex = -1; // Reset selection when searching
-            filteredProjects = projects.filter(project => {
-                // Convert all project values to a searchable string
-                const projectValues = Object.values(project)
-                    .map(value => {
-                        if (Array.isArray(value)) {
-                            return value.join(' ');
-                        }
-                        return String(value);
-                    })
-                    .join('\n')
-                    .toLowerCase();
-                
-                return projectValues.includes(query);
-            });
+            filteredProjects = filterProjects();
             updateVisualizations(filteredProjects);
         });
 
