@@ -409,3 +409,37 @@ article h3 {
     font-style: normal;
     margin-left: 0.3em;
 }
+
+/* Chart container layout */
+.chart-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2em;
+    margin-bottom: 2em;
+}
+
+.chart-container .legend {
+    flex: 1;
+    margin: 0;  /* Remove the margin we set earlier since we're using gap */
+}
+
+/* Update the pie plot styles to work better in the flex container */
+#projects-pie-plot {
+    max-width: 20em;
+    overflow: visible;
+}
+
+/* Make the layout responsive */
+@media (max-width: 768px) {
+    .chart-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1em;
+    }
+
+    #projects-pie-plot {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+    }
+}
