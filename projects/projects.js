@@ -50,6 +50,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .attr('fill', colors(idx));
         });
 
+        // Create legend
+        let legend = d3.select('.legend');
+        
+        // Remove any existing legend items
+        legend.selectAll('li').remove();
+        
+        // Add legend items
+        data.forEach((d, idx) => {
+            legend.append('li')
+                .attr('class', 'legend-item')
+                .attr('style', `--color: ${colors(idx)}`)
+                .html(`<span class="swatch"></span>${d.label}<em>(${d.value})</em>`);
+        });
+
     } catch (error) {
         console.error('Error loading projects:', error);
     }
