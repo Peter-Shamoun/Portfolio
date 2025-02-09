@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const searchInput = document.querySelector('.searchBar');
         searchInput.addEventListener('input', (event) => {
             query = event.target.value.toLowerCase();
-            selectedIndex = -1; // Reset selection when searching
+            // Don't reset selection when searching
             filteredProjects = filterProjects();
             updateVisualizations(filteredProjects);
         });
