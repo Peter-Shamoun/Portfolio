@@ -21,9 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Create arc generator
         let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
         
-        // Sample data and colors
-        let data = [1, 2];
-        let colors = ['gold', 'purple'];
+        // Sample data with more values
+        let data = [1, 2, 3, 4, 5, 5];
+
+        // Create color scale using D3's Tableau 10 color scheme
+        let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
         // Create pie generator
         let sliceGenerator = d3.pie();
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             d3.select('#projects-pie-plot')
                 .append('path')
                 .attr('d', arc)
-                .attr('fill', colors[idx]);
+                .attr('fill', colors(idx));
         });
 
     } catch (error) {
