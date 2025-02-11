@@ -693,3 +693,40 @@ dl.info dd {
   opacity: 0;
   visibility: hidden;
 }
+
+/* Brush styles */
+@keyframes marching-ants {
+  to {
+    stroke-dashoffset: -8; /* 5 + 3 */
+  }
+}
+
+.selection {
+  fill-opacity: 0.1;
+  stroke: black;
+  stroke-opacity: 0.7;
+  stroke-dasharray: 5 3;
+  animation: marching-ants 2s linear infinite;
+}
+
+/* Selected dots styling */
+circle.selected {
+  fill: #ff6b6b !important;
+  stroke: white;
+  stroke-width: 2px;
+}
+
+/* Language breakdown styles */
+#language-breakdown {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--form-background);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+#selection-count {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: var(--color-accent);
+}
