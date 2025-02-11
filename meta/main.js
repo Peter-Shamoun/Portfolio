@@ -320,12 +320,22 @@ function updateLanguageBreakdown() {
   const formatNumber = d3.format(',d');
   const formatPercent = d3.format('.1%');
 
+  // Calculate total lines for percentage
+  const totalLines = lines.length;
+
   for (const [language, count] of sortedBreakdown) {
-    const proportion = count / lines.length;
-    container.innerHTML += `
-      <dt>${language}</dt>
-      <dd>${formatNumber(count)} lines (${formatPercent(proportion)})</dd>
+    const proportion = count / totalLines;
+    const dt = document.createElement('dt');
+    dt.textContent = language;
+    
+    const dd = document.createElement('dd');
+    dd.innerHTML = `
+      <span class="count">${formatNumber(count)} lines</span>
+      <span class="percentage">${formatPercent(proportion)}</span>
     `;
+    
+    container.appendChild(dt);
+    container.appendChild(dd);
   }
 
   return breakdown;
