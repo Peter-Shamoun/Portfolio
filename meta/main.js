@@ -280,9 +280,15 @@ function updateSelection() {
 }
 
 function updateSelectionCount() {
-  const selectedCommits = brushSelection ? commits.filter(isCommitSelected) : [];
+  const selectedCommits = brushSelection
+    ? commits.filter(isCommitSelected)
+    : [];
+
   const countElement = document.getElementById('selection-count');
-  countElement.textContent = `${selectedCommits.length || 'No'} commits selected`;
+  countElement.textContent = `${
+    selectedCommits.length || 'No'
+  } commits selected`;
+
   return selectedCommits;
 }
 
@@ -466,7 +472,11 @@ function createScatterplot(commits) {
     });
 
   // Create brush and raise dots
-  d3.select(svg).call(d3.brush().on('start brush end', brushed));
+  const brush = d3.brush()
+    .extent([[0, 0], [width, height]])
+    .on('start brush end', brushed);
+    
+  d3.select(svg).call(brush);
   d3.select(svg).selectAll('.dots, .overlay ~ *').raise();
 
   console.log('Scatter plot created with dimensions:', { width, height, margin });
