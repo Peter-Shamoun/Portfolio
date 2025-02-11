@@ -100,6 +100,7 @@ const pages = [
   { url: 'projects/', title: 'Projects' },
   { url: 'contacts/', title: 'Contact' },
   { url: 'resume/', title: 'Resume' },
+  { url: 'meta/', title: 'Meta' },
   { url: 'https://github.com/Peter-Shamoun', title: 'GitHub Profile' }
 ];
 
