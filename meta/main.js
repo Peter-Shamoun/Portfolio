@@ -207,6 +207,60 @@ const usableArea = {
   height: height - margin.top - margin.bottom,
 };
 
+function updateTooltipContent(commit) {
+  const link = document.getElementById('commit-link');
+  const date = document.getElementById('commit-date');
+  const time = document.getElementById('commit-time');
+  const author = document.getElementById('commit-author');
+  const lines = document.getElementById('commit-lines');
+
+  if (!commit || Object.keys(commit).length === 0) return;
+
+  link.href = commit.url;
+  link.textContent = commit.id.slice(0, 7);
+  date.textContent = commit.datetime?.toLocaleString('en', {
+    dateStyle: 'full',
+  });
+  time.textContent = commit.datetime?.toLocaleString('en', {
+    timeStyle: 'short',
+  });
+  author.textContent = commit.author;
+  lines.textContent = `${commit.totalLines} lines`;
+}
+
+function updateTooltipVisibility(isVisible) {
+  const tooltip = document.getElementById('commit-tooltip');
+  tooltip.hidden = !isVisible;
+}
+
+function updateTooltipPosition(event) {
+  const tooltip = document.getElementById('commit-tooltip');
+  const padding = 10;
+  
+  // Get viewport dimensions
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+  
+  // Get tooltip dimensions
+  const tooltipRect = tooltip.getBoundingClientRect();
+  
+  // Calculate position
+  let left = event.clientX + padding;
+  let top = event.clientY + padding;
+  
+  // Adjust if tooltip would go off screen
+  if (left + tooltipRect.width > vw) {
+    left = event.clientX - tooltipRect.width - padding;
+  }
+  if (top + tooltipRect.height > vh) {
+    top = event.clientY - tooltipRect.height - padding;
+  }
+  
+  // Apply position
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+}
+
 function createScatterplot(commits) {
   if (!commits || commits.length === 0) {
     console.error('No commit data available for scatter plot');
@@ -293,7 +347,7 @@ function createScatterplot(commits) {
     .attr('transform', `translate(${usableArea.left}, 0)`)
     .call(yAxis);
 
-  // Add dots with enhanced styling
+  // Add dots with enhanced styling and interactivity
   const dots = svg.append('g')
     .attr('class', 'dots')
     .attr('transform', `translate(0, 0)`);
@@ -307,7 +361,27 @@ function createScatterplot(commits) {
     .attr('r', 5)
     .attr('fill', (d) => colorScale(d.hourFrac))
     .attr('stroke', 'white')
-    .attr('stroke-width', 1);
+    .attr('stroke-width', 1)
+    .on('mouseenter', (event, commit) => {
+      updateTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+      d3.select(event.target)
+        .transition()
+        .duration(200)
+        .attr('r', 8);
+    })
+    .on('mousemove', (event) => {
+      updateTooltipPosition(event);
+    })
+    .on('mouseleave', (event) => {
+      updateTooltipContent({});
+      updateTooltipVisibility(false);
+      d3.select(event.target)
+        .transition()
+        .duration(200)
+        .attr('r', 5);
+    });
 
   console.log('Scatter plot created with dimensions:', { width, height, margin });
 }

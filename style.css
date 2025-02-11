@@ -631,3 +631,55 @@ article h3 {
   stroke-width: 2;
   cursor: pointer;
 }
+
+/* Tooltip styles */
+dl.info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5em 1em;
+  margin: 0;
+  font-size: 0.9em;
+  transition-duration: 500ms;
+  transition-property: opacity, visibility;
+}
+
+dl.info dt {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+dl.info dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.tooltip {
+  position: fixed;
+  background: var(--form-background);
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tooltip[hidden]:not(:hover, :focus-within) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Enhanced dot hover effect */
+#chart .dots circle {
+  opacity: 0.8;
+  transition: all 0.2s ease-in-out;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+#chart .dots circle:hover {
+  opacity: 1;
+  transform: scale(1.5);
+  cursor: pointer;
+}
