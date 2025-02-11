@@ -164,13 +164,9 @@ async function loadData() {
     return commits;
   } catch (error) {
     console.error('Error loading data:', error);
-    d3.select('#stats')
+    const errorMessage = d3.select('#stats')
       .append('div')
       .attr('class', 'error-message')
-      .style('padding', '1em')
-      .style('background', 'var(--form-background)')
-      .style('border-radius', '8px')
-      .style('margin', '1em 0')
       .html(`
         <h3 style="margin-top: 0">Data Not Available Yet</h3>
         <p>The code statistics file (loc.csv) is not available yet. This file will be generated automatically when you:</p>
@@ -181,6 +177,13 @@ async function loadData() {
         </ol>
         <p>After the action completes, refresh this page to see the statistics.</p>
       `);
+
+    // Also show error in chart area
+    d3.select('#chart')
+      .append('div')
+      .attr('class', 'error-message')
+      .html('<p>Chart data not available yet. Please wait for the GitHub Action to complete.</p>');
+      
     return null;
   }
 }
@@ -202,8 +205,14 @@ const usableArea = {
 function createScatterplot(commits) {
   if (!commits || commits.length === 0) {
     console.error('No commit data available for scatter plot');
+    d3.select('#chart')
+      .append('div')
+      .attr('class', 'error-message')
+      .html('<p>No commit data available for visualization.</p>');
     return;
   }
+
+  console.log('Creating scatter plot with commits:', commits.length);
 
   // Clear any existing chart
   d3.select('#chart').html('');
@@ -212,8 +221,11 @@ function createScatterplot(commits) {
   const svg = d3
     .select('#chart')
     .append('svg')
+    .attr('width', width)
+    .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`)
-    .style('overflow', 'visible');
+    .style('max-width', '100%')
+    .style('height', 'auto');
 
   // Create scales
   const xScale = d3
@@ -255,18 +267,23 @@ function createScatterplot(commits) {
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', 5)
     .attr('fill', 'steelblue');
+
+  console.log('Scatter plot created');
 }
 
 // Update the DOMContentLoaded event listener to create the scatterplot
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOM Content Loaded');
   try {
     const commits = await loadData();
-    if (commits) {
+    console.log('Data loaded:', commits ? commits.length : 0, 'commits');
+    if (commits && commits.length > 0) {
       displayStats();
       createScatterplot(commits);
     }
   } catch (error) {
     console.error('Error:', error);
-    document.getElementById('stats').innerHTML = '<p class="error">Error loading data</p>';
+    d3.select('#stats').html('<p class="error">Error loading data</p>');
+    d3.select('#chart').html('<p class="error">Error loading chart data</p>');
   }
 }); 
