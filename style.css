@@ -591,28 +591,21 @@ article h3 {
   height: auto;
   background: var(--form-background);
   border-radius: 8px;
-  padding: 1rem;
   box-shadow: var(--shadow-sm);
 }
 
-#chart .dots circle {
-  opacity: 0.7;
-  transition: opacity 0.2s, r 0.2s;
-}
-
-#chart .dots circle:hover {
-  opacity: 1;
-  r: 8;
-}
-
-#chart .domain,
-#chart .tick line {
+/* Axis styling */
+#chart .x-axis path,
+#chart .y-axis path {
   stroke: var(--color-muted);
+  stroke-width: 1px;
 }
 
-#chart .tick text {
+#chart .x-axis text,
+#chart .y-axis text {
   fill: var(--color-text);
   font-size: 12px;
+  font-weight: 500;
 }
 
 /* Gridlines styling */
@@ -624,4 +617,17 @@ article h3 {
 
 #chart .gridlines path {
   stroke-width: 0;
+}
+
+/* Dots styling */
+#chart .dots circle {
+  opacity: 0.8;
+  transition: all 0.2s ease-in-out;
+}
+
+#chart .dots circle:hover {
+  opacity: 1;
+  r: 8;
+  stroke-width: 2;
+  cursor: pointer;
 }

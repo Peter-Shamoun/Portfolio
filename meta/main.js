@@ -191,7 +191,12 @@ async function loadData() {
 // Dimensions for the scatterplot
 const width = 1000;
 const height = 600;
-const margin = { top: 10, right: 10, bottom: 30, left: 20 };
+const margin = { 
+  top: 20,     // Increased from 10
+  right: 30,   // Increased from 10
+  bottom: 40,  // Increased from 30
+  left: 50     // Increased from 20 to accommodate time labels
+};
 
 const usableArea = {
   top: margin.top,
@@ -217,7 +222,7 @@ function createScatterplot(commits) {
   // Clear any existing chart
   d3.select('#chart').html('');
 
-  // Create SVG
+  // Create SVG with explicit dimensions and padding
   const svg = d3
     .select('#chart')
     .append('svg')
@@ -225,7 +230,8 @@ function createScatterplot(commits) {
     .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`)
     .style('max-width', '100%')
-    .style('height', 'auto');
+    .style('height', 'auto')
+    .style('padding', '1rem');
 
   // Create scales
   const xScale = d3
@@ -259,25 +265,38 @@ function createScatterplot(commits) {
       .tickValues(d3.range(0, 25, 2)) // Add lines every 2 hours
   );
 
-  // Create axes
-  const xAxis = d3.axisBottom(xScale);
+  // Create axes with more formatting
+  const xAxis = d3.axisBottom(xScale)
+    .ticks(d3.timeDay.every(1)) // Show one tick per day
+    .tickFormat(d3.timeFormat('%b %d')); // Format as "Mar 21"
+
   const yAxis = d3
     .axisLeft(yScale)
+    .ticks(12) // Show fewer ticks
     .tickFormat((d) => String(d % 24).padStart(2, '0') + ':00');
 
-  // Add axes to SVG
+  // Add axes to SVG with proper positioning
   svg
     .append('g')
+    .attr('class', 'x-axis')
     .attr('transform', `translate(0, ${usableArea.bottom})`)
-    .call(xAxis);
+    .call(xAxis)
+    .selectAll('text')
+    .style('text-anchor', 'end')
+    .attr('dx', '-.8em')
+    .attr('dy', '.15em')
+    .attr('transform', 'rotate(-45)');
 
   svg
     .append('g')
+    .attr('class', 'y-axis')
     .attr('transform', `translate(${usableArea.left}, 0)`)
     .call(yAxis);
 
-  // Add dots
-  const dots = svg.append('g').attr('class', 'dots');
+  // Add dots with enhanced styling
+  const dots = svg.append('g')
+    .attr('class', 'dots')
+    .attr('transform', `translate(0, 0)`);
 
   dots
     .selectAll('circle')
@@ -286,9 +305,11 @@ function createScatterplot(commits) {
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', 5)
-    .attr('fill', (d) => colorScale(d.hourFrac));
+    .attr('fill', (d) => colorScale(d.hourFrac))
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1);
 
-  console.log('Scatter plot created');
+  console.log('Scatter plot created with dimensions:', { width, height, margin });
 }
 
 // Update the DOMContentLoaded event listener to create the scatterplot
