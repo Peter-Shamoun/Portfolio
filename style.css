@@ -632,7 +632,7 @@ article h3 {
   cursor: pointer;
 }
 
-/* Tooltip styles */
+/* Info display styles */
 dl.info {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -653,6 +653,7 @@ dl.info dd {
   font-weight: 600;
 }
 
+/* Tooltip styles */
 .tooltip {
   position: fixed;
   background: var(--form-background);
@@ -665,12 +666,12 @@ dl.info dd {
   pointer-events: none;
 }
 
-.tooltip[hidden]:not(:hover, :focus-within) {
+.tooltip[hidden] {
   opacity: 0;
   visibility: hidden;
 }
 
-/* Enhanced dot hover effect */
+/* Scatter plot dot hover styles */
 #chart .dots circle {
   opacity: 0.8;
   transition: all 0.2s ease-in-out;

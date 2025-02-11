@@ -1,4 +1,4 @@
-import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+import * as d3 from 'https://cdn.skypack.dev/d3@7';
 
 let data = [];
 let commits = [];
@@ -403,16 +403,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     d3.select('#stats').html('<p class="error">Error loading data</p>');
     d3.select('#chart').html('<p class="error">Error loading chart data</p>');
   }
-});
-
-// For static tooltip testing - remove or comment out in production
-const testCommit = {
-  id: "abc1234",
-  url: "https://github.com/Peter-Shamoun/Portfolio/commit/abc1234",
-  datetime: new Date(),
-  author: "Test Author",
-  totalLines: 42
-};
-updateTooltipContent(testCommit);
-updateTooltipVisibility(true);
-updateTooltipPosition({ clientX: 50, clientY: 50 }); 
+}); 
