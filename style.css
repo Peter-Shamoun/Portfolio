@@ -623,13 +623,37 @@ article h3 {
 #chart .dots circle {
   opacity: 0.8;
   transition: all 0.2s ease-in-out;
+  cursor: pointer;
 }
 
 #chart .dots circle:hover {
   opacity: 1;
-  r: 8;
   stroke-width: 2;
   cursor: pointer;
+}
+
+/* Enhanced dot hover effect */
+#chart .dots circle {
+  opacity: 0.7;
+  transition: all 0.2s ease-in-out;
+  transform-origin: center;
+  transform-box: fill-box;
+  pointer-events: all;
+}
+
+#chart .dots circle:hover {
+  opacity: 1;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Ensure smaller dots are clickable when overlapping */
+#chart .dots {
+  pointer-events: none;
+}
+
+#chart .dots circle {
+  pointer-events: all;
 }
 
 /* Tooltip and info styles */
@@ -668,18 +692,4 @@ dl.info dd {
 .tooltip[hidden]:not(:hover, :focus-within) {
   opacity: 0;
   visibility: hidden;
-}
-
-/* Enhanced dot hover effect */
-#chart .dots circle {
-  opacity: 0.8;
-  transition: all 0.2s ease-in-out;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
-#chart .dots circle:hover {
-  opacity: 1;
-  transform: scale(1.5);
-  cursor: pointer;
 }

@@ -271,30 +271,34 @@ function createScatterplot(commits) {
     return;
   }
 
+  console.log('Creating scatter plot with commits:', commits.length);
+
   // Sort commits by total lines in descending order for better overlapping
   const sortedCommits = d3.sort(commits, d => -d.totalLines);
 
   // Calculate the range of edited lines
   const [minLines, maxLines] = d3.extent(sortedCommits, d => d.totalLines);
+  console.log('Lines range:', { minLines, maxLines });
 
   // Create a square root scale for the radius to ensure area is proportional to lines
   const rScale = d3
     .scaleSqrt()
     .domain([minLines, maxLines])
-    .range([3, 25]); // Adjusted range for better visibility
+    .range([2, 30]); // Adjusted range to match requirements
 
   // Clear any existing chart
-  const chartContainer = d3.select('#chart');
-  chartContainer.selectAll('*').remove();
+  d3.select('#chart').html('');
 
   // Create SVG with explicit dimensions and padding
-  const svg = chartContainer
+  const svg = d3
+    .select('#chart')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`)
     .style('max-width', '100%')
-    .style('height', 'auto');
+    .style('height', 'auto')
+    .style('padding', '1rem');
 
   // Create scales
   const xScale = d3
@@ -314,30 +318,31 @@ function createScatterplot(commits) {
     .domain([0, 24])
     .interpolator(d3.interpolateRdYlBu);
 
-  // Add gridlines
+  // Add gridlines BEFORE the axes
   const gridlines = svg
     .append('g')
     .attr('class', 'gridlines')
     .attr('transform', `translate(${usableArea.left}, 0)`);
 
+  // Create gridlines as an axis with no labels and full-width ticks
   gridlines.call(
     d3.axisLeft(yScale)
       .tickFormat('')
       .tickSize(-usableArea.width)
-      .tickValues(d3.range(0, 25, 2))
+      .tickValues(d3.range(0, 25, 2)) // Add lines every 2 hours
   );
 
-  // Create axes
+  // Create axes with more formatting
   const xAxis = d3.axisBottom(xScale)
-    .ticks(d3.timeDay.every(1))
-    .tickFormat(d3.timeFormat('%b %d'));
+    .ticks(d3.timeDay.every(1)) // Show one tick per day
+    .tickFormat(d3.timeFormat('%b %d')); // Format as "Mar 21"
 
   const yAxis = d3
     .axisLeft(yScale)
-    .ticks(12)
+    .ticks(12) // Show fewer ticks
     .tickFormat((d) => String(d % 24).padStart(2, '0') + ':00');
 
-  // Add axes
+  // Add axes to SVG with proper positioning
   svg
     .append('g')
     .attr('class', 'x-axis')
@@ -356,9 +361,9 @@ function createScatterplot(commits) {
     .call(yAxis);
 
   // Add dots with enhanced styling and interactivity
-  const dots = svg
-    .append('g')
-    .attr('class', 'dots');
+  const dots = svg.append('g')
+    .attr('class', 'dots')
+    .attr('transform', `translate(0, 0)`);
 
   dots
     .selectAll('circle')
@@ -371,12 +376,11 @@ function createScatterplot(commits) {
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
     .style('fill-opacity', 0.7)
-    .style('cursor', 'pointer')
-    .on('mouseenter', function(event, commit) {
+    .on('mouseenter', (event, commit) => {
       updateTooltipContent(commit);
       updateTooltipVisibility(true);
       updateTooltipPosition(event);
-      d3.select(this)
+      d3.select(event.target)
         .transition()
         .duration(200)
         .style('fill-opacity', 1)
@@ -385,15 +389,17 @@ function createScatterplot(commits) {
     .on('mousemove', (event) => {
       updateTooltipPosition(event);
     })
-    .on('mouseleave', function(event) {
+    .on('mouseleave', (event) => {
       updateTooltipContent({});
       updateTooltipVisibility(false);
-      d3.select(this)
+      d3.select(event.target)
         .transition()
         .duration(200)
         .style('fill-opacity', 0.7)
         .attr('r', d => rScale(d.totalLines));
     });
+
+  console.log('Scatter plot created with dimensions:', { width, height, margin });
 }
 
 // Update the DOMContentLoaded event listener to create the scatterplot
