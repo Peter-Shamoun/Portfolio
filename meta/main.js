@@ -273,6 +273,19 @@ function createScatterplot(commits) {
 
   console.log('Creating scatter plot with commits:', commits.length);
 
+  // Sort commits by total lines in descending order for better overlapping
+  const sortedCommits = d3.sort(commits, d => -d.totalLines);
+
+  // Calculate the range of edited lines
+  const [minLines, maxLines] = d3.extent(sortedCommits, d => d.totalLines);
+  console.log('Lines range:', { minLines, maxLines });
+
+  // Create a square root scale for the radius to ensure area is proportional to lines
+  const rScale = d3
+    .scaleSqrt()
+    .domain([minLines, maxLines])
+    .range([3, 25]); // Adjusted range for better visibility
+
   // Clear any existing chart
   d3.select('#chart').html('');
 
@@ -290,7 +303,7 @@ function createScatterplot(commits) {
   // Create scales
   const xScale = d3
     .scaleTime()
-    .domain(d3.extent(commits, (d) => d.datetime))
+    .domain(d3.extent(sortedCommits, (d) => d.datetime))
     .range([usableArea.left, usableArea.right])
     .nice();
 
@@ -354,14 +367,15 @@ function createScatterplot(commits) {
 
   dots
     .selectAll('circle')
-    .data(commits)
+    .data(sortedCommits)
     .join('circle')
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
-    .attr('r', 5)
+    .attr('r', d => rScale(d.totalLines))
     .attr('fill', (d) => colorScale(d.hourFrac))
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
+    .style('fill-opacity', 0.7)
     .on('mouseenter', (event, commit) => {
       updateTooltipContent(commit);
       updateTooltipVisibility(true);
@@ -369,7 +383,8 @@ function createScatterplot(commits) {
       d3.select(event.target)
         .transition()
         .duration(200)
-        .attr('r', 8);
+        .style('fill-opacity', 1)
+        .attr('r', d => rScale(d.totalLines) * 1.2);
     })
     .on('mousemove', (event) => {
       updateTooltipPosition(event);
@@ -380,7 +395,8 @@ function createScatterplot(commits) {
       d3.select(event.target)
         .transition()
         .duration(200)
-        .attr('r', 5);
+        .style('fill-opacity', 0.7)
+        .attr('r', d => rScale(d.totalLines));
     });
 
   console.log('Scatter plot created with dimensions:', { width, height, margin });
