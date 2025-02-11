@@ -611,7 +611,7 @@ article h3 {
 /* Gridlines styling */
 #chart .gridlines line {
   stroke: var(--color-muted);
-  stroke-opacity: 0.2;
+  stroke-opacity: 0.4;
   stroke-dasharray: 2,2;
 }
 
