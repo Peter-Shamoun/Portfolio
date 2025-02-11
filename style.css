@@ -490,3 +490,26 @@ article h3 {
 .selected:is(path) {
     fill: var(--color);
 }
+
+/* Stats display */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.stats dt {
+  font-size: 0.9em;
+  color: var(--color-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stats dd {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+}
