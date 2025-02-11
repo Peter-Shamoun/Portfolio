@@ -239,6 +239,26 @@ function createScatterplot(commits) {
     .domain([0, 24])
     .range([usableArea.bottom, usableArea.top]);
 
+  // Create color scale for time of day
+  const colorScale = d3
+    .scaleSequential()
+    .domain([0, 24])
+    .interpolator(d3.interpolateRdYlBu);
+
+  // Add gridlines BEFORE the axes
+  const gridlines = svg
+    .append('g')
+    .attr('class', 'gridlines')
+    .attr('transform', `translate(${usableArea.left}, 0)`);
+
+  // Create gridlines as an axis with no labels and full-width ticks
+  gridlines.call(
+    d3.axisLeft(yScale)
+      .tickFormat('')
+      .tickSize(-usableArea.width)
+      .tickValues(d3.range(0, 25, 2)) // Add lines every 2 hours
+  );
+
   // Create axes
   const xAxis = d3.axisBottom(xScale);
   const yAxis = d3
@@ -266,7 +286,7 @@ function createScatterplot(commits) {
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', 5)
-    .attr('fill', 'steelblue');
+    .attr('fill', (d) => colorScale(d.hourFrac));
 
   console.log('Scatter plot created');
 }

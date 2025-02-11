@@ -614,3 +614,14 @@ article h3 {
   fill: var(--color-text);
   font-size: 12px;
 }
+
+/* Gridlines styling */
+#chart .gridlines line {
+  stroke: var(--color-muted);
+  stroke-opacity: 0.2;
+  stroke-dasharray: 2,2;
+}
+
+#chart .gridlines path {
+  stroke-width: 0;
+}
