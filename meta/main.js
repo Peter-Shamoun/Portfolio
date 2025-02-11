@@ -310,16 +310,21 @@ function updateLanguageBreakdown() {
     (d) => d.type
   );
 
+  // Sort languages by line count in descending order
+  const sortedBreakdown = Array.from(breakdown).sort((a, b) => b[1] - a[1]);
+
   // Update DOM with breakdown
   container.innerHTML = '';
 
-  for (const [language, count] of breakdown) {
-    const proportion = count / lines.length;
-    const formatted = d3.format('.1~%')(proportion);
+  // Format numbers with thousands separator
+  const formatNumber = d3.format(',d');
+  const formatPercent = d3.format('.1%');
 
+  for (const [language, count] of sortedBreakdown) {
+    const proportion = count / lines.length;
     container.innerHTML += `
       <dt>${language}</dt>
-      <dd>${count} lines (${formatted})</dd>
+      <dd>${formatNumber(count)} lines (${formatPercent(proportion)})</dd>
     `;
   }
 

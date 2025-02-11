@@ -719,14 +719,33 @@ circle.selected {
 /* Language breakdown styles */
 #language-breakdown {
   margin-top: 1rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background: var(--form-background);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem 1.5rem;
+  align-items: baseline;
+}
+
+#language-breakdown dt {
+  font-weight: 500;
+  color: var(--color-text);
+  font-size: 1.1em;
+  text-align: right;
+}
+
+#language-breakdown dd {
+  margin: 0;
+  font-size: 1.1em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
 #selection-count {
-  margin-top: 1rem;
+  margin: 1.5rem 0 1rem;
+  font-size: 1.2em;
   font-weight: 500;
   color: var(--color-accent);
 }
