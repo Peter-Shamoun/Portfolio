@@ -44,37 +44,99 @@ function displayStats() {
   // Process commits first
   processCommits();
 
-  // Create the dl element
-  const dl = d3.select('#stats').append('dl').attr('class', 'stats');
+  // Create sections for different types of stats
+  const container = d3.select('#stats');
+  
+  // Add summary section
+  const summary = container.append('section')
+    .attr('class', 'summary-stats');
+  
+  summary.append('h2')
+    .text('Summary Statistics');
 
-  // Add total commits
-  dl.append('dt').text('COMMITS');
-  dl.append('dd').text(commits.length);
+  const summaryDl = summary.append('dl')
+    .attr('class', 'stats');
 
-  // Add number of files
-  dl.append('dt').text('FILES');
-  dl.append('dd').text(d3.group(data, d => d.file).size);
+  // Basic stats
+  const basicStats = [
+    { label: 'COMMITS', value: commits.length },
+    { label: 'FILES', value: d3.group(data, d => d.file).size },
+    { label: 'TOTAL LOC', value: data.length },
+    { label: 'MAX DEPTH', value: d3.max(data, d => d.depth) }
+  ];
 
-  // Add total LOC
-  dl.append('dt').html('TOTAL LOC');
-  dl.append('dd').text(data.length);
-
-  // Add maximum depth
-  dl.append('dt').text('MAX DEPTH');
-  dl.append('dd').text(d3.max(data, d => d.depth));
-
-  // Add longest line
-  dl.append('dt').text('LONGEST LINE');
-  dl.append('dd').text(d3.max(data, d => d.length));
-
-  // Add max lines per file
-  const fileLengths = d3.rollups(
+  // File stats
+  const fileStats = d3.rollups(
     data,
-    v => d3.max(v, d => d.line),
+    v => ({
+      lines: d3.max(v, d => d.line),
+      depth: d3.max(v, d => d.depth),
+      avgDepth: d3.mean(v, d => d.depth)
+    }),
     d => d.file
   );
-  dl.append('dt').text('MAX LINES');
-  dl.append('dd').text(d3.max(fileLengths, d => d[1]));
+
+  const longestFile = d3.greatest(fileStats, d => d[1].lines);
+  const avgFileLength = d3.mean(fileStats, d => d[1].lines);
+  const avgFileDepth = d3.mean(fileStats, d => d[1].avgDepth);
+
+  // Line stats
+  const longestLine = d3.greatest(data, d => d.length);
+  const avgLineLength = d3.mean(data, d => d.length);
+
+  // Time stats
+  const workByHour = d3.rollups(
+    commits,
+    v => v.length,
+    d => d.datetime.getHours()
+  );
+
+  const workByDay = d3.rollups(
+    commits,
+    v => v.length,
+    d => d.datetime.getDay()
+  );
+
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const timeOfDay = hour => {
+    if (hour < 6) return 'Night';
+    if (hour < 12) return 'Morning';
+    if (hour < 18) return 'Afternoon';
+    return 'Evening';
+  };
+
+  const workByTimeOfDay = d3.rollups(
+    commits,
+    v => v.length,
+    d => timeOfDay(d.datetime.getHours())
+  );
+
+  const mostActiveTime = d3.greatest(workByTimeOfDay, d => d[1])[0];
+  const mostActiveDay = dayNames[d3.greatest(workByDay, d => d[1])[0]];
+
+  // Add all stats
+  const allStats = [
+    { label: 'COMMITS', value: commits.length },
+    { label: 'FILES', value: d3.group(data, d => d.file).size },
+    { label: 'TOTAL LOC', value: data.length },
+    { label: 'MAX DEPTH', value: d3.max(data, d => d.depth) },
+    { label: 'LONGEST FILE', value: longestFile[0], detail: `${longestFile[1].lines} lines` },
+    { label: 'AVG FILE LENGTH', value: Math.round(avgFileLength), detail: 'lines' },
+    { label: 'LONGEST LINE', value: longestLine.length, detail: 'characters' },
+    { label: 'AVG LINE LENGTH', value: Math.round(avgLineLength), detail: 'characters' },
+    { label: 'AVG FILE DEPTH', value: avgFileDepth.toFixed(1), detail: 'levels' },
+    { label: 'MOST ACTIVE TIME', value: mostActiveTime },
+    { label: 'MOST ACTIVE DAY', value: mostActiveDay }
+  ];
+
+  // Add stats to the display
+  allStats.forEach(stat => {
+    const dt = summaryDl.append('dt').text(stat.label);
+    const dd = summaryDl.append('dd').text(stat.value);
+    if (stat.detail) {
+      dd.append('small').text(` ${stat.detail}`);
+    }
+  });
 }
 
 async function loadData() {
