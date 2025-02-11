@@ -159,7 +159,8 @@ async function loadData() {
       datetime: new Date(row.datetime),
     }));
     
-    displayStats();
+    // Process commits immediately after loading data
+    processCommits();
     return commits;
   } catch (error) {
     console.error('Error loading data:', error);
@@ -199,6 +200,14 @@ const usableArea = {
 };
 
 function createScatterplot(commits) {
+  if (!commits || commits.length === 0) {
+    console.error('No commit data available for scatter plot');
+    return;
+  }
+
+  // Clear any existing chart
+  d3.select('#chart').html('');
+
   // Create SVG
   const svg = d3
     .select('#chart')
@@ -252,8 +261,10 @@ function createScatterplot(commits) {
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const commits = await loadData();
-    displayStats();
-    createScatterplot(commits);
+    if (commits) {
+      displayStats();
+      createScatterplot(commits);
+    }
   } catch (error) {
     console.error('Error:', error);
     document.getElementById('stats').innerHTML = '<p class="error">Error loading data</p>';
