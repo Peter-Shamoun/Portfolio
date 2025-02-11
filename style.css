@@ -716,23 +716,6 @@ circle.selected {
   stroke-width: 2px;
 }
 
-/* Selection info container */
-.selection-info {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: var(--form-background);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-}
-
-.selection-info #selection-count {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.2em;
-  font-weight: 500;
-  color: var(--color-accent);
-}
-
 /* Language breakdown styles */
 #language-breakdown {
   margin-top: 1rem;
