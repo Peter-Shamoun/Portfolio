@@ -20,7 +20,7 @@
     {
         "title": "Bikewatching",
         "featured": true,
-        "year": 2024,
+        "year": 2025,
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
         "description": "An interactive map visualization of Boston's bike lanes and Bluebikes stations, showing traffic patterns and flow throughout the day. Features include time-based filtering, color-coded traffic flow indicators, and detailed station information.",
         "technologies": ["Mapbox GL JS", "D3.js", "JavaScript", "HTML/CSS"],
