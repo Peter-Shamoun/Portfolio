@@ -184,8 +184,17 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     // Create and append project articles
     projects.forEach(project => {
         const article = document.createElement('article');
+        
+        // Create title with optional link
+        let titleContent;
+        if (project.url) {
+            titleContent = `<a href="${project.url}" target="_blank" rel="noopener noreferrer">${project.title}</a>`;
+        } else {
+            titleContent = project.title;
+        }
+        
         article.innerHTML = `
-            <${headingLevel}>${project.title}</${headingLevel}>
+            <${headingLevel}>${titleContent}</${headingLevel}>
             <img src="${project.image || 'https://vis-society.github.io/labs/2/images/empty.svg'}" alt="${project.title}">
             <div class="project-details">
                 <p>${project.description}</p>
