@@ -10,8 +10,8 @@ let fileTypeColors; // Color scale for file types
 
 // Scrollytelling variables for commits
 let NUM_ITEMS = 0; // Will be set to commits.length
-let ITEM_HEIGHT = 150; // Height of each item in the scrolly
-let VISIBLE_COUNT = 5; // Number of visible items
+let ITEM_HEIGHT = "auto"; // Height of each item in the scrolly
+let VISIBLE_COUNT = 10; // Number of visible items
 let totalHeight = 0; // Will be calculated based on commits.length
 let scrollContainer;
 let spacer;
@@ -19,8 +19,8 @@ let itemsContainer;
 
 // Scrollytelling variables for files
 let filesData = []; // Will store file data for scrollytelling
-let FILES_ITEM_HEIGHT = 150; // Height of each file item
-let FILES_VISIBLE_COUNT = 5; // Number of visible file items
+let FILES_ITEM_HEIGHT = "auto"; // Height of each file item
+let FILES_VISIBLE_COUNT = 10; // Number of visible file items
 let filesTotalHeight = 0; // Will be calculated based on filesData.length
 let filesScrollContainer;
 let filesSpacer;
@@ -66,7 +66,7 @@ function processCommits() {
   
   // Initialize scrollytelling variables for commits
   NUM_ITEMS = commits.length;
-  totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
+  totalHeight = NUM_ITEMS * 200; // Estimate 200px per commit
   
   // Set initial filteredCommits to all commits
   filteredCommits = [...commits];
@@ -106,7 +106,7 @@ function processFileData() {
   filesData.sort((a, b) => b.totalLines - a.totalLines);
   
   // Initialize scrollytelling variables for files
-  filesTotalHeight = (filesData.length - 1) * FILES_ITEM_HEIGHT;
+  filesTotalHeight = filesData.length * 200; // Estimate 200px per file
 }
 
 function displayStats() {
@@ -671,13 +671,16 @@ function updateFileTypeLegend(fileTypes) {
 
 // Function to render items in the commits scrolly
 function renderItems(startIndex) {
+  console.log(`Rendering commits from index ${startIndex}`);
+  
   // Clear previous items
   itemsContainer.selectAll('div').remove();
   
   const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
+  let visibleCommits = commits.slice(startIndex, endIndex);
   let newCommitSlice = commits.slice(0, endIndex); // Show commits up to the current point
   
-  // Update the scatterplot with the current slice of commits
+  // Update the scatterplot with all commits up to current point
   updateScatterplot(newCommitSlice);
   
   // Update file visualization
@@ -685,26 +688,27 @@ function renderItems(startIndex) {
   displayCommitFiles();
   
   // Create items in the scrolly
-  const items = itemsContainer.selectAll('div')
-    .data(commits.slice(startIndex, endIndex))
+  const items = itemsContainer.selectAll('div.item')
+    .data(visibleCommits)
     .enter()
     .append('div')
     .attr('class', 'item')
-    .style('position', 'absolute')
-    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`)
-    .style('width', '100%');
+    .style('margin-bottom', '20px'); // Ensure spacing between items
   
   // Add narrative content to each item
   items.html((commit, index) => {
     const commitIndex = startIndex + index;
+    const filesCount = d3.rollups(commit.lines, D => D.length, d => d.file).length;
     return `
+      <p style="font-weight: bold; margin-bottom: 8px;">
+        Commit #${commitIndex + 1} - ${commit.datetime.toLocaleString("en", {dateStyle: "medium", timeStyle: "short"})}
+      </p>
       <p>
-        On ${commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})}, I made
         <a href="${commit.url}" target="_blank">
-          ${commitIndex > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'}
+          ${commitIndex > 0 ? 'Another glorious commit' : 'My first commit, and it was glorious'}
         </a>. 
         I edited ${commit.totalLines} lines across 
-        ${d3.rollups(commit.lines, D => D.length, d => d.file).length} files. 
+        ${filesCount} file${filesCount !== 1 ? 's' : ''}. 
         Then I looked over all I had made, and I saw that it was very good.
       </p>
       <p>
@@ -721,6 +725,8 @@ function renderItems(startIndex) {
 
 // Function to render items in the files scrolly
 function renderFileItems(startIndex) {
+  console.log(`Rendering files from index ${startIndex}`);
+  
   // Clear previous items
   filesItemsContainer.selectAll('div').remove();
   
@@ -731,14 +737,12 @@ function renderFileItems(startIndex) {
   displaySelectedFiles(visibleFiles);
   
   // Create items in the scrolly
-  const items = filesItemsContainer.selectAll('div')
+  const items = filesItemsContainer.selectAll('div.item')
     .data(visibleFiles)
     .enter()
     .append('div')
     .attr('class', 'item')
-    .style('position', 'absolute')
-    .style('top', (_, idx) => `${idx * FILES_ITEM_HEIGHT}px`)
-    .style('width', '100%');
+    .style('margin-bottom', '20px'); // Ensure spacing between items
   
   // Add narrative content to each item
   items.html((file, index) => {
@@ -756,14 +760,17 @@ function renderFileItems(startIndex) {
     const percentage = (file.totalLines / totalCodeLines * 100).toFixed(1);
     
     return `
+      <p style="font-weight: bold; margin-bottom: 8px;">
+        <strong>${file.name}</strong> (${fileIndex + 1} of ${filesData.length})
+      </p>
       <p>
-        <strong>${file.name}</strong> is a ${file.extension.toUpperCase()} file with 
+        This ${file.extension.toUpperCase()} file has 
         ${file.totalLines} lines of code (${percentage}% of the codebase). 
         It contains ${file.types.join(', ')} code with an average line length of 
         ${Math.round(avgLineLength)} characters.
       </p>
       <p>
-        This file was modified in ${commitCount} commit${commitCount !== 1 ? 's' : ''}, 
+        Modified in ${commitCount} commit${commitCount !== 1 ? 's' : ''}, 
         first on ${new Date(file.firstCommitDate).toLocaleString("en", {dateStyle: "medium"})}
         and most recently on ${new Date(file.lastCommitDate).toLocaleString("en", {dateStyle: "medium"})}.
       </p>
@@ -947,32 +954,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       spacer = d3.select('#spacer');
       itemsContainer = d3.select('#items-container');
       
-      // Set spacer height based on number of commits
+      // Estimate a reasonable spacer height
+      totalHeight = commits.length * 200; // Estimate 200px per commit
       spacer.style('height', `${totalHeight}px`);
       
       // Add scroll event listener for commits
-      scrollContainer.on('scroll', () => {
+      scrollContainer.on('scroll', debounce(() => {
         const scrollTop = scrollContainer.property('scrollTop');
-        let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
+        const totalScrollHeight = totalHeight - scrollContainer.node().clientHeight;
+        const scrollRatio = scrollTop / totalScrollHeight;
+        let startIndex = Math.floor(scrollRatio * Math.max(0, commits.length - VISIBLE_COUNT));
         startIndex = Math.max(0, Math.min(startIndex, commits.length - VISIBLE_COUNT));
         renderItems(startIndex);
-      });
+      }, 100));
       
       // Initialize files scrollytelling
       filesScrollContainer = d3.select('#files-scroll-container');
       filesSpacer = d3.select('#files-spacer');
       filesItemsContainer = d3.select('#files-items-container');
       
-      // Set spacer height based on number of files
+      // Estimate a reasonable spacer height for files
+      filesTotalHeight = filesData.length * 200; // Estimate 200px per file
       filesSpacer.style('height', `${filesTotalHeight}px`);
       
       // Add scroll event listener for files
-      filesScrollContainer.on('scroll', () => {
+      filesScrollContainer.on('scroll', debounce(() => {
         const scrollTop = filesScrollContainer.property('scrollTop');
-        let startIndex = Math.floor(scrollTop / FILES_ITEM_HEIGHT);
+        const totalScrollHeight = filesTotalHeight - filesScrollContainer.node().clientHeight;
+        const scrollRatio = scrollTop / totalScrollHeight;
+        let startIndex = Math.floor(scrollRatio * Math.max(0, filesData.length - FILES_VISIBLE_COUNT));
         startIndex = Math.max(0, Math.min(startIndex, filesData.length - FILES_VISIBLE_COUNT));
         renderFileItems(startIndex);
-      });
+      }, 100));
       
       // Initial renders
       renderItems(0);
@@ -991,4 +1004,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     d3.select('#stats').html('<p class="error">Error loading data</p>');
     d3.select('#chart').html('<p class="error">Error loading chart data</p>');
   }
-}); 
+});
+
+// Debounce function to limit how often a function is called
+function debounce(func, wait) {
+  let timeout;
+  return function() {
+    const context = this, args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(context, args);
+    }, wait);
+  };
+} 

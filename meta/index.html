@@ -45,17 +45,19 @@
         #scrollytelling, #files-scrollytelling {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: subgrid;
+            grid-template-columns: 1fr 1fr;
             margin-bottom: 2rem;
+            gap: 20px;
         }
 
         #scroll-container, #files-scroll-container {
             position: relative;
-            width: 95%;
-            height: 500px;
-            overflow-y: scroll;
+            width: 100%;
+            height: 400px;
+            overflow-y: auto;
             border: 1px solid #ccc;
             margin-bottom: 50px;
+            padding-right: 10px; /* Add padding for scrollbar */
         }
         
         #scroll-container {
@@ -68,10 +70,23 @@
 
         #chart {
             grid-column: 2;
+            align-self: start;
+            position: sticky;
+            top: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         #files-visualization {
             grid-column: 1;
+            align-self: start;
+            position: sticky;
+            top: 20px;
+            min-height: 400px;
+            overflow-y: auto;
+            max-height: 600px;
         }
 
         .spacer {
@@ -84,34 +99,42 @@
         }
 
         .items-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         .date-indicator-container {
-            position: absolute;
+            position: sticky;
+            top: 0;
             right: 10px;
-            top: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 5px 10px;
             border-radius: 4px;
             font-weight: bold;
             z-index: 10;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            margin-left: auto;
+            width: fit-content;
         }
         
         :root.dark-mode .date-indicator-container {
-            background-color: rgba(30, 30, 30, 0.8);
+            background-color: rgba(30, 30, 30, 0.9);
         }
 
         .item {
-            height: 150px;
+            position: relative;
+            height: auto;
+            min-height: 100px;
             padding: 15px;
+            margin-bottom: 15px;
             box-sizing: border-box;
             border-bottom: 2px solid #eee;
             background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
         }
         
         .item p {
@@ -256,6 +279,25 @@
         :root.dark-mode #files-scroll-container {
             border-color: #444;
         }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1000px) {
+            #scrollytelling, #files-scrollytelling {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            #scroll-container, #chart,
+            #files-scroll-container, #files-visualization {
+                grid-column: 1;
+                width: 100%;
+            }
+            
+            #chart, #files-visualization {
+                position: relative;
+                top: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -272,11 +314,11 @@
         <!-- Commits scrollytelling -->
         <div id="scrollytelling">
             <div id="scroll-container">
-                <div id="spacer" class="spacer"></div>
-                <div id="items-container" class="items-container"></div>
                 <div id="date-indicator-container" class="date-indicator-container">
                     <span id="date-indicator"></span>
                 </div>
+                <div id="items-container" class="items-container"></div>
+                <div id="spacer" class="spacer"></div>
             </div>
             <div id="chart"></div>
         </div>
@@ -323,11 +365,11 @@
                 </dl>
             </div>
             <div id="files-scroll-container">
-                <div id="files-spacer" class="spacer"></div>
-                <div id="files-items-container" class="items-container"></div>
                 <div id="files-date-indicator-container" class="date-indicator-container">
                     <span id="files-date-indicator"></span>
                 </div>
+                <div id="files-items-container" class="items-container"></div>
+                <div id="files-spacer" class="spacer"></div>
             </div>
         </div>
     </section>
