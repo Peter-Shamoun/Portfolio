@@ -12,32 +12,26 @@
             max-width: min(120ch, 80vw);
         }
         
-        /* Timeline slider styles */
-        #timeline-control {
-            display: flex;
-            align-items: baseline;
-            margin-bottom: 1rem;
-            padding: 0 1rem;
-        }
-        
-        #timeSlider {
-            flex: 1;
-            margin: 0 1rem;
-        }
-        
-        #selectedTime {
-            margin-left: auto;
-            font-weight: bold;
-        }
-        
         /* Circle transition styles */
         .dots circle {
             transition: r 0.3s ease-out, fill-opacity 0.3s ease-out;
+            animation: circleAppear 0.3s ease-out;
+        }
+        
+        @keyframes circleAppear {
+            from {
+                r: 0;
+                fill-opacity: 0;
+            }
+            to {
+                fill-opacity: 0.7;
+            }
         }
         
         @starting-style {
             .dots circle {
                 r: 0;
+                fill-opacity: 0;
             }
         }
         
@@ -135,6 +129,14 @@
             background-color: rgba(255, 255, 255, 0.9);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .item.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .item p {
@@ -142,13 +144,37 @@
             line-height: 1.5;
         }
         
+        .item p:first-child {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .item code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
         .item a {
             color: #0066cc;
             text-decoration: none;
+            font-weight: bold;
         }
         
         .item a:hover {
             text-decoration: underline;
+        }
+        
+        :root.dark-mode .item p:first-child {
+            color: #eee;
+            border-bottom-color: #444;
+        }
+        
+        :root.dark-mode .item code {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         /* File visualization styles */
@@ -164,6 +190,18 @@
             margin-bottom: 1rem;
         }
         
+        .sort-controls {
+            margin-top: 0.5rem;
+        }
+        
+        .sort-controls select {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+        
         .files {
             display: grid;
             grid-template-columns: auto 1fr;
@@ -176,10 +214,22 @@
             display: grid;
             grid-template-columns: subgrid;
             margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .files > div.file-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        :root.dark-mode .files > div.file-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
         
         .files dt {
             grid-column: 1;
+            padding-top: 0.6em;
         }
         
         .files dd {
@@ -196,6 +246,16 @@
         .files code {
             font-family: monospace;
             font-size: 0.9em;
+            display: block;
+        }
+        
+        .file-type-indicator {
+            display: inline-block;
+            width: 0.8em;
+            height: 0.8em;
+            border-radius: 50%;
+            margin-right: 0.5em;
+            vertical-align: middle;
         }
         
         .files code small {
@@ -215,12 +275,8 @@
             width: 0.5em;
             aspect-ratio: 1;
             border-radius: 50%;
-            transition: transform 0.2s ease;
-        }
-        
-        .line:hover {
-            transform: scale(1.5);
-            z-index: 1;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0.8;
         }
         
         .no-files {
@@ -248,6 +304,20 @@
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .legend-item.highlighted,
+        .legend-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        :root.dark-mode .legend-item.highlighted,
+        :root.dark-mode .legend-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .swatch {
@@ -255,6 +325,12 @@
             height: 1em;
             border-radius: 50%;
             margin-right: 0.5rem;
+        }
+        
+        .legend-item span small {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-left: 0.5em;
         }
         
         /* Dark mode styles */
@@ -278,6 +354,12 @@
         :root.dark-mode #scroll-container,
         :root.dark-mode #files-scroll-container {
             border-color: #444;
+        }
+        
+        :root.dark-mode .sort-controls select {
+            background-color: #333;
+            color: white;
+            border-color: #555;
         }
         
         /* Responsive adjustments */
@@ -355,6 +437,15 @@
                 <div class="file-section-header">
                     <div>
                         <p>Each dot represents one line of code. Files are sorted by number of lines.</p>
+                        <div class="sort-controls">
+                            <label for="file-sort">Sort by: 
+                                <select id="file-sort">
+                                    <option value="lines" selected>Number of lines (descending)</option>
+                                    <option value="name">File name (A-Z)</option>
+                                    <option value="extension">File extension (A-Z)</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
                     <div class="file-type-legend">
                         <!-- File type legend will be dynamically generated here -->

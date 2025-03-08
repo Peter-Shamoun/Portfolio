@@ -59,11 +59,9 @@ function processCommits() {
       });
 
       return ret;
-    });
+    })
+    .sort((a, b) => d3.ascending(a.datetime, b.datetime));
     
-  // Sort commits by date
-  commits.sort((a, b) => a.datetime - b.datetime);
-  
   // Initialize scrollytelling variables for commits
   NUM_ITEMS = commits.length;
   totalHeight = NUM_ITEMS * 200; // Estimate 200px per commit
@@ -230,6 +228,10 @@ async function loadData() {
     
     // Process commits immediately after loading data
     processCommits();
+    
+    // Set filteredCommits to all commits initially
+    filteredCommits = [...commits];
+    
     return commits;
   } catch (error) {
     console.error('Error loading data:', error);
@@ -335,7 +337,10 @@ function isCommitSelected(commit) {
 }
 
 function updateSelection() {
-  d3.selectAll('circle').classed('selected', (d) => isCommitSelected(d));
+  // Select all circles and update their 'selected' class
+  d3.select('#chart')
+    .selectAll('circle')
+    .classed('selected', (d) => isCommitSelected(d));
 }
 
 function updateSelectionCount() {
@@ -518,17 +523,34 @@ function updateScatterplot(commits) {
     .attr('class', 'dots')
     .attr('transform', `translate(0, 0)`);
 
-  dots
+  // Use enter-update-exit pattern for better transitions
+  const circles = dots
     .selectAll('circle')
-    .data(sortedCommits)
-    .join('circle')
+    .data(sortedCommits, d => d.id); // Use commit ID as the key for better data binding
+  
+  // Remove old circles
+  circles.exit().remove();
+  
+  // Update existing circles
+  circles
+    .attr('cx', (d) => xScale(d.datetime))
+    .attr('cy', (d) => yScale(d.hourFrac))
+    .attr('r', d => rScale(d.totalLines))
+    .attr('fill', (d) => colorScale(d.hourFrac));
+  
+  // Add new circles
+  const newCircles = circles.enter()
+    .append('circle')
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', d => rScale(d.totalLines))
     .attr('fill', (d) => colorScale(d.hourFrac))
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
-    .style('fill-opacity', 0.7)
+    .style('fill-opacity', 0.7);
+  
+  // Merge new and existing circles for event handling
+  newCircles.merge(circles)
     .on('mouseenter', (event, commit) => {
       updateTooltipContent(commit);
       updateTooltipVisibility(true);
@@ -538,7 +560,7 @@ function updateScatterplot(commits) {
         .duration(200)
         .style('fill-opacity', 1)
         .attr('r', d => rScale(d.totalLines) * 1.2)
-        .classed('selected', true);
+        .classed('selected', isCommitSelected(commit));
     })
     .on('mousemove', (event) => {
       updateTooltipPosition(event);
@@ -587,8 +609,20 @@ function updateFileVisualization() {
       };
     });
   
-  // Sort files by number of lines in descending order
-  files = d3.sort(files, (d) => -d.lines.length);
+  // Sort files based on the selected sort option
+  const fileSort = document.getElementById('file-sort');
+  const sortOption = fileSort ? fileSort.value : 'lines';
+  
+  if (sortOption === 'lines') {
+    // Sort files by number of lines in descending order
+    files = d3.sort(files, (d) => -d.lines.length);
+  } else if (sortOption === 'name') {
+    // Sort files by name in ascending order
+    files = d3.sort(files, (d) => d.name.toLowerCase());
+  } else if (sortOption === 'extension') {
+    // Sort files by extension in ascending order
+    files = d3.sort(files, (d) => d.extension.toLowerCase());
+  }
   
   // Get unique file types for the legend
   const fileTypes = Array.from(new Set(lines.map(d => d.type)));
@@ -597,6 +631,16 @@ function updateFileVisualization() {
   if (!fileTypeColors) {
     fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
   }
+  
+  // Update the file stats
+  const fileStatsElement = d3.select('.file-section-header p');
+  fileStatsElement.html(`
+    <strong>${files.length}</strong> files with a total of <strong>${lines.length}</strong> lines of code. 
+    Each dot represents one line of code. Files are sorted by ${
+      sortOption === 'lines' ? 'number of lines' : 
+      sortOption === 'name' ? 'file name' : 'file extension'
+    }.
+  `);
   
   // Clear existing visualization
   d3.select('.files').selectAll('div').remove();
@@ -621,7 +665,19 @@ function updateFileVisualization() {
   // Add file names with line count and extension
   filesContainer.append('dt')
     .append('code')
-    .html(d => `${d.name}<small>${d.lines.length} lines</small><small class="extension">.${d.extension}</small>`);
+    .html(d => {
+      // Get the most common file type for this file
+      const typeCount = d3.rollup(d.lines, v => v.length, l => l.type);
+      const mostCommonType = Array.from(typeCount).sort((a, b) => b[1] - a[1])[0][0];
+      const typeColor = fileTypeColors(mostCommonType);
+      
+      return `
+        <span class="file-type-indicator" style="background-color: ${typeColor}"></span>
+        ${d.name}
+        <small>${d.lines.length} lines</small>
+        <small class="extension">.${d.extension}</small>
+      `;
+    });
   
   // Add dots for each line
   filesContainer.append('dd')
@@ -631,7 +687,29 @@ function updateFileVisualization() {
     .append('div')
     .attr('class', 'line')
     .style('background', d => fileTypeColors(d.type))
-    .attr('title', d => `${d.type} - Line ${d.line}`);
+    .attr('title', d => {
+      const date = new Date(d.datetime).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+      return `Type: ${d.type}\nLine: ${d.line}\nAdded: ${date}\nCommit: ${d.commit.slice(0, 7)}`;
+    })
+    .on('mouseenter', function() {
+      d3.select(this)
+        .transition()
+        .duration(150)
+        .style('transform', 'scale(2)')
+        .style('opacity', '1')
+        .style('z-index', '10');
+    })
+    .on('mouseleave', function() {
+      d3.select(this)
+        .transition()
+        .duration(150)
+        .style('transform', 'scale(1)')
+        .style('opacity', '0.8')
+        .style('z-index', '1');
+    });
   
   // Create legend for file types
   updateFileTypeLegend(fileTypes);
@@ -646,8 +724,23 @@ function updateFileTypeLegend(fileTypes) {
   // Clear existing legend
   legendContainer.html('');
   
-  // Add legend title
+  // Add legend title and description
   legendContainer.append('h3').text('File Types');
+  legendContainer.append('p')
+    .style('font-size', '0.9em')
+    .style('margin-top', '0.5em')
+    .style('margin-bottom', '1em')
+    .text('Each dot is colored by its file type:');
+  
+  // Count lines by type
+  const linesByType = d3.rollup(
+    filteredCommits.flatMap(d => d.lines),
+    v => v.length,
+    d => d.type
+  );
+  
+  // Format numbers with thousands separator
+  const formatNumber = d3.format(',d');
   
   // Create legend items
   const legendItems = legendContainer
@@ -655,7 +748,25 @@ function updateFileTypeLegend(fileTypes) {
     .data(fileTypes)
     .enter()
     .append('div')
-    .attr('class', 'legend-item');
+    .attr('class', 'legend-item')
+    .on('mouseenter', function(event, type) {
+      // Highlight dots of this type
+      d3.selectAll('.line')
+        .style('opacity', d => d.type === type ? 1 : 0.3)
+        .style('transform', d => d.type === type ? 'scale(1.2)' : 'scale(1)');
+      
+      // Highlight this legend item
+      d3.select(this).classed('highlighted', true);
+    })
+    .on('mouseleave', function() {
+      // Reset all dots
+      d3.selectAll('.line')
+        .style('opacity', 0.8)
+        .style('transform', 'scale(1)');
+      
+      // Reset this legend item
+      d3.select(this).classed('highlighted', false);
+    });
   
   // Add color swatch
   legendItems
@@ -663,10 +774,40 @@ function updateFileTypeLegend(fileTypes) {
     .attr('class', 'swatch')
     .style('background', d => fileTypeColors(d));
   
-  // Add type name
+  // Add type name and count
   legendItems
     .append('span')
-    .text(d => d);
+    .html(d => `${d} <small>(${formatNumber(linesByType.get(d))} lines)</small>`);
+}
+
+// Function to generate varied narrative text for commits
+function generateCommitNarrative(commit, index, filesCount) {
+  // Array of possible narrative templates
+  const narrativeTemplates = [
+    `During this ${getTimeOfDay(commit.datetime)}, I made ${index === 0 ? 'my first commit' : 'another important update'}. I edited ${commit.totalLines} lines across ${filesCount} file${filesCount !== 1 ? 's' : ''}.`,
+    
+    `At ${commit.datetime.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'})}, I ${index === 0 ? 'started this project' : 'continued development'} with a commit that changed ${commit.totalLines} lines in ${filesCount} file${filesCount !== 1 ? 's' : ''}.`,
+    
+    `This ${getTimeOfDay(commit.datetime)} brought ${commit.totalLines} line changes to ${filesCount} file${filesCount !== 1 ? 's' : ''}. ${index === 0 ? 'The journey begins!' : 'The project continues to grow.'}`,
+    
+    `${index === 0 ? 'The first commit!' : 'Another step forward.'} Made during a ${getTimeOfDay(commit.datetime)}, this update touched ${commit.totalLines} lines across ${filesCount} file${filesCount !== 1 ? 's' : ''}.`,
+    
+    `${commit.datetime.toLocaleString('en', {weekday: 'long'})} ${getTimeOfDay(commit.datetime)}: ${commit.totalLines} lines modified in ${filesCount} file${filesCount !== 1 ? 's' : ''}.`
+  ];
+  
+  // Select a random narrative template based on the commit index
+  const narrativeIndex = Math.floor((index + commit.id.charCodeAt(0)) % narrativeTemplates.length);
+  return narrativeTemplates[narrativeIndex];
+}
+
+// Helper function to get the time of day description
+function getTimeOfDay(datetime) {
+  const hour = datetime.getHours();
+  
+  if (hour < 6) return "late-night coding session";
+  if (hour < 12) return "morning productivity sprint";
+  if (hour < 18) return "afternoon development session";
+  return "evening coding time";
 }
 
 // Function to render items in the commits scrolly
@@ -699,24 +840,40 @@ function renderItems(startIndex) {
   items.html((commit, index) => {
     const commitIndex = startIndex + index;
     const filesCount = d3.rollups(commit.lines, D => D.length, d => d.file).length;
+    const narrative = generateCommitNarrative(commit, commitIndex, filesCount);
+    
+    // Get the most common file type
+    const typeCount = d3.rollup(commit.lines, v => v.length, d => d.type);
+    const sortedTypes = Array.from(typeCount).sort((a, b) => b[1] - a[1]);
+    const mainType = sortedTypes[0][0];
+    
     return `
       <p style="font-weight: bold; margin-bottom: 8px;">
-        Commit #${commitIndex + 1} - ${commit.datetime.toLocaleString("en", {dateStyle: "medium", timeStyle: "short"})}
+        Commit #${commitIndex + 1} - ${commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})}
       </p>
       <p>
-        <a href="${commit.url}" target="_blank">
-          ${commitIndex > 0 ? 'Another glorious commit' : 'My first commit, and it was glorious'}
-        </a>. 
-        I edited ${commit.totalLines} lines across 
-        ${filesCount} file${filesCount !== 1 ? 's' : ''}. 
-        Then I looked over all I had made, and I saw that it was very good.
+        ${narrative}
+        <a href="${commit.url}" target="_blank">View commit ${commit.id.slice(0, 7)}</a>
       </p>
       <p>
-        This commit focused on ${commit.types.join(', ')} files, 
-        primarily affecting ${commit.files.slice(0, 3).join(', ')}
+        This commit primarily focused on <strong>${mainType}</strong> files, 
+        with changes to ${commit.files.slice(0, 3).map(f => `<code>${f}</code>`).join(', ')}
         ${commit.files.length > 3 ? `and ${commit.files.length - 3} other files` : ''}.
+        ${sortedTypes.length > 1 ? `Other file types affected: ${sortedTypes.slice(1).map(t => t[0]).join(', ')}.` : ''}
+      </p>
+      <p>
+        Average line length: ${Math.round(commit.avgLineLength)} characters.
+        ${commit.author ? `Committed by: ${commit.author}` : ''}
       </p>
     `;
+  });
+  
+  // Add the visible class with a slight delay for each item
+  items.each(function(d, i) {
+    const item = d3.select(this);
+    setTimeout(() => {
+      item.classed('visible', true);
+    }, i * 100); // 100ms delay between each item
   });
   
   // Update date indicator
@@ -725,68 +882,79 @@ function renderItems(startIndex) {
 
 // Function to render items in the files scrolly
 function renderFileItems(startIndex) {
-  console.log(`Rendering files from index ${startIndex}`);
-  
   // Clear previous items
-  filesItemsContainer.selectAll('div').remove();
+  filesItemsContainer.selectAll('.item').remove();
   
+  // Calculate end index
   const endIndex = Math.min(startIndex + FILES_VISIBLE_COUNT, filesData.length);
-  let visibleFiles = filesData.slice(startIndex, endIndex);
   
-  // Update file visualization with the current files
-  displaySelectedFiles(visibleFiles);
+  // Get the current visible files
+  const currentFiles = filesData.slice(startIndex, endIndex);
+  
+  // Update file visualization with current files
+  displaySelectedFiles(currentFiles);
   
   // Create items in the scrolly
-  const items = filesItemsContainer.selectAll('div.item')
-    .data(visibleFiles)
+  const items = filesItemsContainer
+    .selectAll('.item')
+    .data(currentFiles)
     .enter()
     .append('div')
     .attr('class', 'item')
-    .style('margin-bottom', '20px'); // Ensure spacing between items
+    .classed('visible', true);
   
   // Add narrative content to each item
-  items.html((file, index) => {
-    const fileIndex = startIndex + index;
-    
-    // Calculate average line length
-    const avgLineLength = d3.mean(file.lines, d => d.length);
-    
-    // Count commits that modified this file
-    const commitIds = new Set(file.lines.map(d => d.commit));
-    const commitCount = commitIds.size;
-    
-    // Calculate percentage of codebase
-    const totalCodeLines = filesData.reduce((sum, f) => sum + f.totalLines, 0);
-    const percentage = (file.totalLines / totalCodeLines * 100).toFixed(1);
-    
-    return `
-      <p style="font-weight: bold; margin-bottom: 8px;">
-        <strong>${file.name}</strong> (${fileIndex + 1} of ${filesData.length})
-      </p>
-      <p>
-        This ${file.extension.toUpperCase()} file has 
-        ${file.totalLines} lines of code (${percentage}% of the codebase). 
-        It contains ${file.types.join(', ')} code with an average line length of 
-        ${Math.round(avgLineLength)} characters.
-      </p>
-      <p>
-        Modified in ${commitCount} commit${commitCount !== 1 ? 's' : ''}, 
-        first on ${new Date(file.firstCommitDate).toLocaleString("en", {dateStyle: "medium"})}
-        and most recently on ${new Date(file.lastCommitDate).toLocaleString("en", {dateStyle: "medium"})}.
-      </p>
-      <p>
-        ${fileIndex === 0 ? 
-          `This is the largest file in the codebase, representing a significant portion of the project.` : 
-          `This is the ${fileIndex + 1}${getOrdinalSuffix(fileIndex + 1)} largest file in the codebase.`}
-        ${file.types.length > 1 ? 
-          `It's a mixed-type file containing multiple languages, which suggests it may serve as a bridge between different parts of the application.` : 
-          `It's a single-language file focused on ${file.types[0]} code.`}
-      </p>
-    `;
-  });
+  items.append('p')
+    .html(d => {
+      const avgLineLength = d.lines.reduce((sum, line) => sum + line.length, 0) / d.lines.length;
+      const commitCount = new Set(d.lines.map(line => line.commit)).size;
+      const percentOfCodebase = ((d.lines.length / totalLines) * 100).toFixed(1);
+      
+      return `<strong>${d.name}</strong>`;
+    });
+  
+  items.append('p')
+    .html(d => {
+      const avgLineLength = d.lines.reduce((sum, line) => sum + line.length, 0) / d.lines.length;
+      const commitCount = new Set(d.lines.map(line => line.commit)).size;
+      const percentOfCodebase = ((d.lines.length / totalLines) * 100).toFixed(1);
+      
+      let narrative = `This file has <strong>${d.lines.length} lines</strong> of code`;
+      
+      // Add information about file size
+      if (d.lines.length > 500) {
+        narrative += `, making it one of the <strong>largest files</strong> in the codebase`;
+      } else if (d.lines.length < 50) {
+        narrative += `, making it one of the <strong>smallest files</strong> in the codebase`;
+      }
+      
+      narrative += `. It represents <strong>${percentOfCodebase}%</strong> of the entire codebase.`;
+      
+      // Add information about file types
+      const fileTypes = [...new Set(d.lines.map(line => line.type))];
+      if (fileTypes.length > 1) {
+        narrative += ` This file contains <strong>multiple languages</strong>: ${fileTypes.join(', ')}.`;
+      } else if (fileTypes.length === 1) {
+        narrative += ` This file is written in <strong>${fileTypes[0]}</strong>.`;
+      }
+      
+      // Add information about commits
+      if (commitCount > 1) {
+        narrative += ` It has been modified across <strong>${commitCount} different commits</strong>.`;
+      } else {
+        narrative += ` It was created or modified in <strong>a single commit</strong>.`;
+      }
+      
+      // Add information about average line length
+      narrative += ` The average line length is <strong>${Math.round(avgLineLength)} characters</strong>.`;
+      
+      return narrative;
+    });
   
   // Update file date indicator
-  updateFileDateIndicator(startIndex);
+  if (currentFiles.length > 0) {
+    updateFileDateIndicator(startIndex);
+  }
 }
 
 // Helper function to get ordinal suffix
@@ -858,7 +1026,19 @@ function displaySelectedFiles(files) {
   // Add file names with line count and extension
   filesContainer.append('dt')
     .append('code')
-    .html(d => `${d.name}<small>${d.totalLines} lines</small><small class="extension">.${d.extension}</small>`);
+    .html(d => {
+      // Get the most common file type for this file
+      const typeCount = d3.rollup(d.lines, v => v.length, l => l.type);
+      const mostCommonType = Array.from(typeCount).sort((a, b) => b[1] - a[1])[0][0];
+      const typeColor = fileTypeColors(mostCommonType);
+      
+      return `
+        <span class="file-type-indicator" style="background-color: ${typeColor}"></span>
+        ${d.name}
+        <small>${d.lines.length} lines</small>
+        <small class="extension">.${d.extension}</small>
+      `;
+    });
   
   // Add dots for each line
   filesContainer.append('dd')
@@ -868,7 +1048,29 @@ function displaySelectedFiles(files) {
     .append('div')
     .attr('class', 'line')
     .style('background', d => fileTypeColors(d.type))
-    .attr('title', d => `${d.type} - Line ${d.line}`);
+    .attr('title', d => {
+      const date = new Date(d.datetime).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+      return `Type: ${d.type}\nLine: ${d.line}\nAdded: ${date}\nCommit: ${d.commit.slice(0, 7)}`;
+    })
+    .on('mouseenter', function() {
+      d3.select(this)
+        .transition()
+        .duration(150)
+        .style('transform', 'scale(2)')
+        .style('opacity', '1')
+        .style('z-index', '10');
+    })
+    .on('mouseleave', function() {
+      d3.select(this)
+        .transition()
+        .duration(150)
+        .style('transform', 'scale(1)')
+        .style('opacity', '0.8')
+        .style('z-index', '1');
+    });
   
   // Create legend for file types
   updateFileTypeLegend(fileTypes);
@@ -887,44 +1089,26 @@ function displayCommitFiles() {
   let files = d3
     .groups(lines, (d) => d.file)
     .map(([name, lines]) => {
-      return { 
-        name, 
-        lines,
-        // Extract file extension for display
-        extension: name.split('.').pop()
-      };
+      return { name, lines };
     });
   
   // Sort files by number of lines in descending order
   files = d3.sort(files, (d) => -d.lines.length);
   
-  // Get unique file types for the legend
-  const fileTypes = Array.from(new Set(lines.map(d => d.type)));
-  
   // Clear existing visualization
   d3.select('.files').selectAll('div').remove();
   
-  // If no files, show a message
-  if (files.length === 0) {
-    d3.select('.files')
-      .append('div')
-      .attr('class', 'no-files')
-      .text('No files to display for the current commits.');
-    return;
-  }
-  
   // Create container for files
   let filesContainer = d3.select('.files')
-    .selectAll('div.file-item')
+    .selectAll('div')
     .data(files)
     .enter()
     .append('div')
     .attr('class', 'file-item');
   
-  // Add file names with line count and extension
+  // Add file names with line count
   filesContainer.append('dt')
-    .append('code')
-    .html(d => `${d.name}<small>${d.lines.length} lines</small><small class="extension">.${d.extension}</small>`);
+    .html(d => `<code>${d.name}</code><small>${d.lines.length} lines</small>`);
   
   // Add dots for each line
   filesContainer.append('dd')
@@ -933,11 +1117,7 @@ function displayCommitFiles() {
     .enter()
     .append('div')
     .attr('class', 'line')
-    .style('background', d => fileTypeColors(d.type))
-    .attr('title', d => `${d.type} - Line ${d.line}`);
-  
-  // Create legend for file types
-  updateFileTypeLegend(fileTypes);
+    .style('background', d => fileTypeColors(d.type));
 }
 
 // Update the DOMContentLoaded event listener to initialize both scrollytelling sections
@@ -948,6 +1128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Data loaded:', commits ? commits.length : 0, 'commits');
     if (commits && commits.length > 0) {
       displayStats();
+      
+      // Set up the file sort dropdown
+      const fileSort = document.getElementById('file-sort');
+      if (fileSort) {
+        fileSort.addEventListener('change', () => {
+          updateFileVisualization();
+        });
+      }
       
       // Initialize commits scrollytelling
       scrollContainer = d3.select('#scroll-container');
